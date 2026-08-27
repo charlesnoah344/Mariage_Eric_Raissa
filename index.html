@@ -45,29 +45,45 @@ img{max-width:100%;display:block}
 .intro{
   position:fixed;inset:0;z-index:100;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(120% 120% at 50% 22%, #fdf1ec 0%, #f3ddd3 45%, #e3c3ba 100%);
+  background:
+    radial-gradient(55% 40% at 15% 8%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(50% 40% at 85% 12%, rgba(255,255,255,.4), transparent 65%),
+    radial-gradient(70% 60% at 50% 105%, rgba(216,150,150,.3), transparent 70%),
+    radial-gradient(120% 120% at 50% 20%, #fdeae5 0%, #f6d2c9 55%, #edb9ae 100%);
   transition:opacity 1s ease, visibility 1s ease;
 }
 .intro.open{opacity:0;visibility:hidden;pointer-events:none}
 
 .intro-photo{
   position:absolute;inset:0;z-index:0;
-  background:url('eric-raissa-duo.jpg') center top/100% auto no-repeat;
-  filter:grayscale(1) contrast(.9) brightness(1.2);
-  opacity:.5;
-  -webkit-mask-image:radial-gradient(55% 48% at 50% 26%, #000 0%, transparent 78%);
-  mask-image:radial-gradient(55% 48% at 50% 26%, #000 0%, transparent 78%);
+  background:url('eric-raissa-blend.jpg') center 30%/118% auto no-repeat;
+  filter:contrast(.96) saturate(1.05) brightness(1.03);
+  -webkit-mask-image:radial-gradient(60% 24% at 50% 13%, #000 0%, #000 42%, transparent 85%);
+  mask-image:radial-gradient(60% 24% at 50% 13%, #000 0%, #000 42%, transparent 85%);
 }
-.intro-tint{
-  position:absolute;inset:0;z-index:0;
-  background:linear-gradient(180deg, rgba(94,22,34,.5), rgba(94,22,34,.1) 55%, transparent 80%);
-  mix-blend-mode:multiply;
+.intro-glow{
+  position:absolute;inset:0;z-index:1;
+  background:radial-gradient(42% 30% at 50% 14%, transparent 35%, rgba(253,234,229,.9) 85%);
 }
 
-.intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;width:100%}
-.im-eyebrow{font-family:var(--display);letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--gold-deep);text-shadow:0 2px 16px var(--ivory),0 0 6px var(--ivory)}
-.im-names{font-family:var(--script);font-size:clamp(2.3rem,11vw,3.6rem);color:var(--wine);line-height:1;margin:.15em 0 .55em;text-shadow:0 4px 22px var(--ivory),0 0 10px var(--ivory)}
-.im-names .amp{color:var(--gold-deep);margin:0 .12em}
+.intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;padding-top:clamp(110px,26vh,170px);width:100%}
+.im-eyebrow{font-family:var(--display);letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--wine);text-shadow:0 2px 16px var(--ivory),0 0 6px var(--ivory)}
+.im-names{
+  position:relative;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
+  gap:.2em .35em;margin:.2em 0 .5em;text-shadow:0 4px 22px var(--ivory),0 0 10px var(--ivory);
+}
+.im-names .im-name{font-family:var(--script);font-size:clamp(2rem,9.5vw,3.2rem);color:var(--wine);line-height:1}
+.im-names .im-and{font-family:var(--display);font-style:italic;font-size:clamp(1rem,3vw,1.3rem);color:var(--wine-soft)}
+.im-names .im-rose{
+  width:clamp(30px,7vw,42px);height:clamp(30px,7vw,42px);border-radius:50%;
+  overflow:hidden;flex:none;box-shadow:0 3px 10px rgba(66,15,24,.3);
+  background:url('rose-thumb.jpg') center/cover;
+}
+.ghost-rose{
+  position:absolute;left:-4%;top:8%;width:90px;height:90px;z-index:-1;
+  background:url('rose-thumb.jpg') center/cover;border-radius:50%;
+  opacity:.22;filter:blur(1.5px);
+}
 
 .envelope{
   position:relative;width:min(78vw,340px);aspect-ratio:3/2;
@@ -95,23 +111,38 @@ img{max-width:100%;display:block}
   border-bottom:1px solid rgba(226,196,137,.4);
   transition:transform .8s ease, z-index 0s .8s;
 }
-/* wax seal */
-.seal{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:64px;height:64px;border-radius:50%;z-index:6;
-  background:radial-gradient(circle at 35% 30%, var(--gold-light), var(--gold-deep) 72%);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--display);font-weight:600;color:var(--wine-deep);font-size:1.2rem;
-  box-shadow:inset 0 2px 6px rgba(255,255,255,.45), 0 6px 14px rgba(0,0,0,.4);
+/* diamond gem seal */
+.gem{
+  position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);
+  width:15%;aspect-ratio:1;border-radius:50%;z-index:6;
+  background:conic-gradient(from 210deg,
+    #ffffff 0deg, #cfe3f0 18deg, #f4f9fc 38deg, #9fb9cc 58deg,
+    #ffffff 82deg, #d8e8f2 104deg, #ffffff 128deg, #b7cbdb 152deg,
+    #ffffff 178deg, #e3edf3 202deg, #ffffff 228deg, #a9c0d2 252deg,
+    #ffffff 278deg, #dbe9f1 302deg, #ffffff 328deg, #c3d6e2 352deg, #ffffff 360deg);
+  box-shadow:0 0 0 3px rgba(255,255,255,.55), 0 8px 16px rgba(0,0,0,.45), inset 0 0 8px rgba(255,255,255,.6);
   transition:transform .5s ease, opacity .5s ease;
 }
-.seal::after{content:"";position:absolute;inset:5px;border-radius:50%;border:1px dashed rgba(94,22,34,.35)}
+.gem::after{content:"";position:absolute;top:18%;left:24%;width:20%;height:13%;background:#fff;border-radius:50%;filter:blur(.6px);transform:rotate(-30deg);opacity:.95}
+
+.motto{position:absolute;top:76%;left:50%;transform:translateX(-50%);width:82%;z-index:6;pointer-events:none}
+.motto text{font-family:var(--display);font-size:8.5px;letter-spacing:2.2px;fill:var(--gold-light)}
 
 .intro.animating .env-flap{transform:rotateX(180deg);z-index:1}
-.intro.animating .seal{transform:translate(-50%,-50%) scale(.2);opacity:0}
+.intro.animating .gem{transform:translate(-50%,-50%) scale(.2);opacity:0}
+.intro.animating .motto{opacity:0;transition:opacity .3s ease}
+
+.corner-rose{
+  position:absolute;bottom:-13%;width:34%;aspect-ratio:1;z-index:9;
+  background:url('rose-corner.png') center/contain no-repeat;
+  filter:drop-shadow(0 4px 8px rgba(66,15,24,.35));
+  pointer-events:none;
+}
+.corner-rose-left{left:-11%;transform:rotate(-10deg)}
+.corner-rose-right{right:-11%;transform:scaleX(-1) rotate(-10deg)}
 
 .tap-hint{
-  margin-top:24px;text-align:center;
+  margin-top:24px;text-align:center;position:relative;z-index:11;
   font-family:var(--display);letter-spacing:.28em;text-transform:uppercase;
   font-size:.72rem;color:var(--wine);animation:pulse 2.2s ease-in-out infinite;
 }
@@ -267,16 +298,28 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
 <!-- ===== INTRO ENVELOPE ===== -->
 <div class="intro" id="intro" role="button" tabindex="0" aria-label="Ouvrir le faire-part">
   <div class="intro-photo" aria-hidden="true"></div>
-  <div class="intro-tint" aria-hidden="true"></div>
+  <div class="intro-glow" aria-hidden="true"></div>
   <div class="intro-content">
     <p class="im-eyebrow">Notre mariage</p>
-    <p class="im-names">Eric<span class="amp">&amp;</span>Raissa</p>
+    <p class="im-names">
+      <span class="ghost-rose" aria-hidden="true"></span>
+      <span class="im-name">Raïssa</span>
+      <span class="im-rose" aria-hidden="true"></span>
+      <span class="im-and">et</span>
+      <span class="im-name">Eric</span>
+    </p>
     <div class="envelope">
       <div class="env-body">
         <div class="env-pocket"></div>
       </div>
       <div class="env-flap"></div>
-      <div class="seal">E&amp;R</div>
+      <div class="gem" aria-hidden="true"></div>
+      <svg class="motto" viewBox="0 0 220 40" aria-hidden="true">
+        <path id="mottoArc" d="M6,4 Q110,46 214,4" fill="none"/>
+        <text text-anchor="middle"><textPath href="#mottoArc" startOffset="50%">Amour pour toujours</textPath></text>
+      </svg>
+      <div class="corner-rose corner-rose-left" aria-hidden="true"></div>
+      <div class="corner-rose corner-rose-right" aria-hidden="true"></div>
     </div>
     <div class="tap-hint">Touchez pour ouvrir</div>
   </div>
