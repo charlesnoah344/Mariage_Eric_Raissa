@@ -2,7 +2,7 @@
  * Backend RSVP gratuit pour le site de mariage — Google Sheets + Apps Script.
  *
  * INSTALLATION (5 minutes) :
- * 1. Créez un Google Sheet (ex: "RSVP Mariage Eric & Raissa").
+ * 1. Créez un Google Sheet (ex: "RSVP Mariage Raïssa & Eric").
  *    Sur la 1ère ligne, mettez les en-têtes : Date | Nom | Réponse | Nombre | Message
  * 2. Dans ce Sheet : Extensions > Apps Script.
  * 3. Supprimez le code par défaut, collez tout le contenu de ce fichier.
