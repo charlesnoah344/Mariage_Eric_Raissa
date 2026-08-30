@@ -332,6 +332,10 @@ h2{font-family:var(--display);font-weight:500;font-size:clamp(2rem,6vw,3rem);col
 .evening-list li{display:flex;gap:14px;padding:9px 2px;border-bottom:1px solid rgba(193,151,78,.2);font-size:.9rem;color:var(--ink)}
 .evening-list li:last-child{border-bottom:none}
 .evening-list .t{flex:none;width:88px;font-family:var(--display);font-weight:600;font-size:.86rem;letter-spacing:.02em;color:var(--gold-deep);white-space:nowrap}
+.modal-subhead{margin:18px 0 0;font-family:var(--display);letter-spacing:.15em;text-transform:uppercase;font-size:.72rem;color:var(--gold-deep);text-align:center}
+.pin-list{list-style:none;margin:10px auto 0;max-width:380px;text-align:left}
+.pin-list li{display:flex;align-items:flex-start;gap:10px;padding:7px 2px;font-size:.9rem;color:var(--ink)}
+.pin-list svg{flex:none;width:16px;height:16px;margin-top:1px;color:var(--gold-deep)}
 
 /* ============ RSVP ============ */
 .rsvp{background:linear-gradient(180deg,#f4e9e0,var(--ivory));text-align:center}
@@ -482,6 +486,7 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
         <h3>Mariage religieux</h3>
         <div class="time">13 h 00</div>
         <p>Paroisse Christ-Roi Tsinga<br>Yaoundé</p>
+        <button type="button" class="card-btn" data-open-modal="religieuxModal">Voir le programme</button>
         <a href="https://www.google.com/maps/search/?api=1&query=Paroisse%20Christ-Roi%20Tsinga%20de%20Yaound%C3%A9" target="_blank" rel="noopener">Voir l'itinéraire</a>
       </div>
       <div class="card">
@@ -516,6 +521,28 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
       <li><span class="t">09h00</span><span>Fin de la Cérémonie</span></li>
       <li><span class="t">09h00–11h30</span><span>Séance Photos des Mariés &amp; des Invités</span></li>
       <li><span class="t">11h30</span><span>Fin de la Séance Photos</span></li>
+    </ul>
+  </div>
+</dialog>
+
+<dialog id="religieuxModal" class="modal">
+  <div class="modal-card">
+    <button type="button" class="modal-close" data-close-modal aria-label="Fermer">&times;</button>
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M10 4h4M6 21V11l6-4 6 4v10M6 21h12M10 21v-5h4v5"/></svg></div>
+    <h3>Programme du mariage religieux</h3>
+    <ul class="evening-list">
+      <li><span class="t">12h30</span><span>Arrivée des Mariés</span></li>
+      <li><span class="t">13h00</span><span>Entrée des Mariés &amp; Début de la Célébration</span></li>
+      <li><span class="t">13h00–13h30</span><span>Messe de Mariage</span></li>
+      <li><span class="t">13h30</span><span>Fin de la Célébration</span></li>
+      <li><span class="t">13h45–16h00</span><span>Séance Photos des Mariés</span></li>
+    </ul>
+    <p class="modal-subhead">Lieux de la séance photos</p>
+    <ul class="pin-list">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Rond-Point Bastos</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Carrefour Hôtel de Ville</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Bois Sainte-Anastasie</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Monument «&nbsp;J'aime mon pays, le Cameroun&nbsp;»</span></li>
     </ul>
   </div>
 </dialog>
