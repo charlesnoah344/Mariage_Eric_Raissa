@@ -137,7 +137,7 @@ img{max-width:100%;display:block}
   color:#fff;font-size:1.1em;text-shadow:0 0 6px rgba(255,255,255,.9);
 }
 
-.motto{position:absolute;top:66%;left:50%;transform:translateX(-50%);width:58%;z-index:6;pointer-events:none}
+.motto{position:absolute;top:80%;left:50%;transform:translateX(-50%);width:58%;z-index:6;pointer-events:none}
 .motto text{font-family:var(--display);font-size:10px;letter-spacing:1.6px;fill:#fff8ec}
 
 .intro.animating .env-flap{transform:rotateX(180deg);z-index:1}
@@ -253,16 +253,41 @@ h2{font-family:var(--display);font-weight:500;font-size:clamp(2rem,6vw,3rem);col
 .card h3{font-family:var(--display);font-weight:600;font-size:1.5rem;color:var(--wine);margin:.4em 0 .2em}
 .card .time{font-family:var(--display);letter-spacing:.2em;color:var(--gold-deep);font-size:.95rem}
 .card p{margin-top:8px;font-size:.95rem;color:var(--ink)}
-.card a{
+.card a,.card .card-btn{
   display:inline-block;margin-top:16px;padding:10px 22px;
   background:var(--wine);color:var(--gold-light);border-radius:999px;
   text-decoration:none;font-family:var(--display);letter-spacing:.1em;
   text-transform:uppercase;font-size:.78rem;font-weight:600;
+  border:none;cursor:pointer;
   transition:background .25s ease, transform .15s ease;
 }
-.card a:hover{background:var(--wine-soft)}
-.card a:active{transform:scale(.96)}
+.card a:hover,.card .card-btn:hover{background:var(--wine-soft)}
+.card a:active,.card .card-btn:active{transform:scale(.96)}
+.card .card-btn{display:block;margin:12px auto 0}
 @media(max-width:560px){.cards{grid-template-columns:1fr}}
+
+/* ============ EVENING PROGRAMME MODAL ============ */
+.modal{position:fixed;inset:0;margin:auto;border:none;padding:0;background:transparent;max-width:92vw;width:440px;max-height:85vh;border-radius:14px}
+.modal::backdrop{background:rgba(66,15,24,.55);backdrop-filter:blur(2px)}
+.modal-card{
+  position:relative;background:var(--paper);border:1px solid var(--gold-light);border-radius:14px;
+  padding:36px 26px;text-align:center;box-shadow:0 24px 60px -20px var(--shadow);
+  max-height:82vh;overflow-y:auto;
+}
+.modal-close{
+  position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--gold-light);background:var(--ivory);color:var(--wine);
+  font-size:1.1rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s ease;
+}
+.modal-close:hover{background:#f4e9e0}
+.modal-card .ic{color:var(--gold-deep)}
+.modal-card .ic svg{width:32px;height:32px;margin:0 auto}
+.modal-card h3{font-family:var(--display);font-weight:600;font-size:1.4rem;color:var(--wine);margin:.4em 0 .1em}
+.evening-list{list-style:none;margin:14px auto 0;max-width:340px;text-align:left}
+.evening-list li{display:flex;gap:16px;padding:9px 2px;border-bottom:1px solid rgba(193,151,78,.2);font-size:.92rem;color:var(--ink)}
+.evening-list li:last-child{border-bottom:none}
+.evening-list .t{flex:none;width:58px;font-family:var(--display);font-weight:600;letter-spacing:.03em;color:var(--gold-deep)}
 
 /* ============ RSVP ============ */
 .rsvp{background:linear-gradient(180deg,#f4e9e0,var(--ivory));text-align:center}
@@ -414,11 +439,32 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
         <h3>Soirée-réception</h3>
         <div class="time">21 h 00</div>
         <p>Franco-Hôtel<br>Yaoundé</p>
+        <button type="button" class="card-btn" data-open-modal="eveningModal">Voir le programme</button>
         <a href="https://www.google.com/maps/search/?api=1&query=Franco-H%C3%B4tel%20Yaound%C3%A9" target="_blank" rel="noopener">Voir l'itinéraire</a>
+        
       </div>
     </div>
   </div>
 </section>
+
+<dialog id="eveningModal" class="modal">
+  <div class="modal-card">
+    <button type="button" class="modal-close" data-close-modal aria-label="Fermer">&times;</button>
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="15.5" r="4"/><circle cx="15.5" cy="15.5" r="4"/><path d="M12 3l2 4h-4l2-4Z"/></svg></div>
+    <h3>Programme de la réception</h3>
+    <ul class="evening-list">
+      <li><span class="t">18h00</span><span>Accueil &amp; Piano-bar</span></li>
+      <li><span class="t">20h00</span><span>Installation des invités</span></li>
+      <li><span class="t">20h30</span><span>Entrée des mariés</span></li>
+      <li><span class="t">21h00</span><span>Ouverture du buffet</span></li>
+      <li><span class="t">22h00</span><span>Prestations artistiques</span></li>
+      <li><span class="t">22h30</span><span>Coupure du gâteau</span></li>
+      <li><span class="t">23h00</span><span>Remise des cadeaux</span></li>
+      <li><span class="t">23h30</span><span>Ouverture du bal</span></li>
+      <li><span class="t">00h00</span><span>Soirée dansante</span></li>
+    </ul>
+  </div>
+</dialog>
 
 <!-- ===== CODE VESTIMENTAIRE ===== -->
 <section>
@@ -575,6 +621,19 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }});
   },{threshold:.18});
   document.querySelectorAll('.reveal').forEach(x=>io.observe(x));
+
+  /* ---- MODALES (programme de la soirée, etc.) ---- */
+  document.querySelectorAll('[data-open-modal]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById(btn.dataset.openModal).showModal();
+    });
+  });
+  document.querySelectorAll('dialog.modal').forEach(dialog=>{
+    dialog.querySelectorAll('[data-close-modal]').forEach(btn=>{
+      btn.addEventListener('click', ()=> dialog.close());
+    });
+    dialog.addEventListener('click', e=>{ if(e.target===dialog) dialog.close(); });
+  });
 
   /* ---- RSVP : révéler le formulaire au clic ---- */
   const toggleBtn = document.getElementById('toggleForm');
