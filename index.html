@@ -83,6 +83,12 @@ img{max-width:100%;display:block}
   position:absolute;inset:0;z-index:1;
   background:radial-gradient(48% 36% at 50% 15%, transparent 40%, rgba(253,234,229,.9) 88%);
 }
+.intro-flower{
+  position:absolute;bottom:-4%;width:clamp(90px,24vw,170px);z-index:1;
+  filter:drop-shadow(0 12px 22px rgba(66,15,24,.35));pointer-events:none;
+}
+.intro-flower-left{left:-3%}
+.intro-flower-right{right:-3%;transform:scaleX(-1)}
 
 .intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;padding-top:clamp(130px,30vh,195px);width:100%}
 .im-eyebrow{font-family:var(--display);letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--wine);text-shadow:0 2px 16px var(--ivory),0 0 6px var(--ivory)}
@@ -97,78 +103,66 @@ img{max-width:100%;display:block}
   overflow:hidden;flex:none;box-shadow:0 3px 10px rgba(66,15,24,.3);
   background:url('rose-thumb.png') center/cover;
 }
-.ghost-rose{
-  position:absolute;left:-11%;top:-18%;width:130px;height:130px;z-index:-1;
-  background:url('rose-thumb.png') center/cover;border-radius:50%;
-  opacity:.32;filter:blur(1px);
-}
 
 .envelope{
-  position:relative;width:min(80vw,360px);aspect-ratio:3/2;
-  cursor:pointer;perspective:1400px;
-  filter:drop-shadow(0 26px 40px rgba(66,15,24,.4));
+  position:relative;width:min(78vw,340px);aspect-ratio:3/2;
+  margin-top:clamp(28px,7vh,64px);
+  cursor:pointer;
+  filter:drop-shadow(0 30px 46px rgba(40,8,14,.45));
 }
 .env-body{
-  position:absolute;inset:0;border-radius:8px;overflow:hidden;
+  position:absolute;inset:0;border-radius:16px;overflow:hidden;
+  border:1px solid rgba(226,196,137,.4);
   background:
-    linear-gradient(115deg, transparent 32%, rgba(255,255,255,.22) 46%, transparent 62%),
-    linear-gradient(155deg,#8a2233 0%,var(--wine) 42%,var(--wine-deep) 100%);
+    radial-gradient(120% 90% at 18% -4%, rgba(255,255,255,.1), transparent 55%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.02) 0 2px, transparent 2px 5px),
+    linear-gradient(165deg, #7a2033 0%, var(--wine) 48%, #3c0f18 100%);
+  box-shadow:inset 0 0 0 1px rgba(226,196,137,.12), inset 0 1px 0 rgba(255,255,255,.08);
 }
-.env-pocket{
-  position:absolute;inset:0;border-radius:8px;
-  background:
-    linear-gradient(135deg, transparent 49.6%, rgba(0,0,0,.22) 50%) no-repeat left bottom / 50% 100%,
-    linear-gradient(-135deg, transparent 49.6%, rgba(255,255,255,.08) 50%) no-repeat right bottom / 50% 100%,
-    linear-gradient(var(--wine-soft),var(--wine));
-  z-index:3;
+.env-sheen{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:2}
+.env-sheen::before{
+  content:"";position:absolute;top:-60%;left:-60%;width:38%;height:220%;
+  background:linear-gradient(75deg, transparent, rgba(226,196,137,.28), transparent);
+  transform:rotate(10deg);
+  animation:sheen-sweep 6.5s ease-in-out infinite;
 }
+@keyframes sheen-sweep{0%,100%{left:-60%}50%{left:118%}}
 /* flap */
-.env-flap{
-  position:absolute;top:0;left:0;width:100%;height:60%;
-  background:
-    linear-gradient(115deg, transparent 35%, rgba(255,255,255,.2) 48%, transparent 64%),
-    linear-gradient(160deg,#8a2233,var(--wine));
-  clip-path:polygon(0 0,100% 0,50% 100%);
-  transform-origin:top;z-index:5;
-  border-bottom:1px solid rgba(226,196,137,.4);
-  transition:transform .8s ease, z-index 0s .8s;
+.env-flap{position:absolute;top:0;left:0;width:100%;height:56%;z-index:5;overflow:visible;
+  filter:drop-shadow(0 14px 18px rgba(20,4,8,.4));
+  transform-origin:top;transition:transform .9s cubic-bezier(.6,.05,.28,1), z-index 0s .9s;
 }
-/* diamond gem seal */
-.gem{
-  position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);
-  width:21%;aspect-ratio:1;border-radius:50%;z-index:6;
-  background:conic-gradient(from 210deg,
-    #ffffff 0deg, #cfe3f0 18deg, #f4f9fc 38deg, #9fb9cc 58deg,
-    #ffffff 82deg, #d8e8f2 104deg, #ffffff 128deg, #b7cbdb 152deg,
-    #ffffff 178deg, #e3edf3 202deg, #ffffff 228deg, #a9c0d2 252deg,
-    #ffffff 278deg, #dbe9f1 302deg, #ffffff 328deg, #c3d6e2 352deg, #ffffff 360deg);
-  box-shadow:0 0 0 4px rgba(255,255,255,.6), 0 10px 20px rgba(0,0,0,.5), inset 0 0 10px rgba(255,255,255,.65);
+.env-flap svg{display:block;width:100%;height:100%}
+/* wax-style monogram seal */
+.seal{
+  position:absolute;top:56%;left:50%;transform:translate(-50%,-50%);
+  width:24%;aspect-ratio:1;border-radius:50%;z-index:6;
+  background:radial-gradient(circle at 32% 26%, #f8ecc4, var(--gold) 58%, #8a6a2e 100%);
+  box-shadow:0 0 0 3px var(--wine-deep), 0 14px 26px rgba(0,0,0,.5),
+    inset 0 2px 4px rgba(255,255,255,.55), inset 0 -3px 7px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   transition:transform .5s ease, opacity .5s ease;
 }
-.gem::after{content:"";position:absolute;top:18%;left:24%;width:20%;height:13%;background:#fff;border-radius:50%;filter:blur(.6px);transform:rotate(-30deg);opacity:.95}
-.gem::before{
-  content:"✦";position:absolute;top:-38%;left:50%;transform:translateX(-50%);
-  color:#fff;font-size:1.1em;text-shadow:0 0 6px rgba(255,255,255,.9);
+.seal::before{
+  content:"";position:absolute;inset:-14%;border-radius:50%;
+  border:1.5px solid rgba(226,196,137,.5);
+  animation:seal-pulse 2.6s ease-out infinite;
 }
-
-.motto{position:absolute;top:80%;left:50%;transform:translateX(-50%);width:58%;z-index:6;pointer-events:none}
-.motto text{font-family:var(--display);font-size:10px;letter-spacing:1.6px;fill:#fff8ec}
+.seal-ring{position:absolute;inset:9%;border-radius:50%;border:1px solid rgba(94,22,34,.35);pointer-events:none}
+.seal-mono{font-family:var(--display);font-weight:600;font-size:1.15rem;color:var(--wine-deep);letter-spacing:.02em;line-height:1}
+.seal-mono i{font-style:normal;font-size:.62em;margin:0 .08em;opacity:.75}
+.seal-date{font-family:var(--display);font-size:.5rem;letter-spacing:.16em;color:var(--wine-deep);opacity:.82;margin-top:3px}
+@keyframes seal-pulse{0%{transform:scale(.86);opacity:.65}70%{transform:scale(1.4);opacity:0}100%{opacity:0}}
+.sparkle{position:absolute;color:#fff;text-shadow:0 0 6px rgba(255,255,255,.9);animation:twinkle 2.6s ease-in-out infinite}
+.sparkle-a{top:6%;right:12%;font-size:.7rem;animation-delay:.3s}
+.sparkle-b{bottom:10%;left:8%;font-size:.5rem;animation-delay:1.2s}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
 
 .intro.animating .env-flap{transform:rotateX(180deg);z-index:1}
-.intro.animating .gem{transform:translate(-50%,-50%) scale(.2);opacity:0}
-.intro.animating .motto{opacity:0;transition:opacity .3s ease}
-
-.corner-rose{
-  position:absolute;bottom:-9%;width:44%;aspect-ratio:700/1027;z-index:9;
-  background:url('rose-corner.png') center/contain no-repeat;
-  filter:drop-shadow(0 6px 12px rgba(66,15,24,.4));
-  pointer-events:none;
-}
-.corner-rose-left{left:-17%;transform:rotate(-14deg)}
-.corner-rose-right{right:-17%;transform:scaleX(-1) rotate(-14deg)}
+.intro.animating .seal{transform:translate(-50%,-50%) scale(.2);opacity:0}
 
 .tap-hint{
-  margin-top:24px;text-align:center;position:relative;z-index:11;
+  margin-top:26px;text-align:center;position:relative;z-index:11;
   font-family:var(--display);letter-spacing:.28em;text-transform:uppercase;
   font-size:.72rem;color:var(--wine);animation:pulse 2.2s ease-in-out infinite;
 }
@@ -385,10 +379,11 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
   <div class="intro-photo" aria-hidden="true"></div>
   <div class="intro-tint" aria-hidden="true"></div>
   <div class="intro-glow" aria-hidden="true"></div>
+  <img class="intro-flower intro-flower-left" src="flower-corner.png" alt="" aria-hidden="true">
+  <img class="intro-flower intro-flower-right" src="flower-corner.png" alt="" aria-hidden="true">
   <div class="intro-content">
     <p class="im-eyebrow">Notre mariage</p>
     <p class="im-names">
-      <span class="ghost-rose" aria-hidden="true"></span>
       <span class="im-name">Raïssa</span>
       <span class="im-rose" aria-hidden="true"></span>
       <span class="im-and">et</span>
@@ -396,16 +391,27 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
     </p>
     <div class="envelope">
       <div class="env-body">
-        <div class="env-pocket"></div>
+        <div class="env-sheen" aria-hidden="true"></div>
       </div>
-      <div class="env-flap"></div>
-      <div class="gem" aria-hidden="true"></div>
-      <svg class="motto" viewBox="0 0 220 40" aria-hidden="true">
-        <path id="mottoArc" d="M6,4 Q110,46 214,4" fill="none"/>
-        <text text-anchor="middle"><textPath href="#mottoArc" startOffset="50%">Amour pour toujours</textPath></text>
-      </svg>
-      <div class="corner-rose corner-rose-left" aria-hidden="true"></div>
-      <div class="corner-rose corner-rose-right" aria-hidden="true"></div>
+      <div class="env-flap">
+        <svg viewBox="0 0 100 56" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="flapGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#8a2540"/>
+              <stop offset="100%" stop-color="#3c0f18"/>
+            </linearGradient>
+          </defs>
+          <polygon points="0,0 100,0 50,56" fill="url(#flapGrad)" stroke="#e2c489" stroke-width="1" stroke-opacity="0.6" vector-effect="non-scaling-stroke"/>
+          <polygon points="5,4 95,4 50,50" fill="none" stroke="#e2c489" stroke-width="0.6" stroke-opacity="0.3" vector-effect="non-scaling-stroke"/>
+        </svg>
+      </div>
+      <div class="seal" aria-hidden="true">
+        <span class="seal-ring"></span>
+        <span class="seal-mono">R<i>&amp;</i>E</span>
+        <span class="seal-date">19 · 12 · 26</span>
+        <span class="sparkle sparkle-a">✦</span>
+        <span class="sparkle sparkle-b">✦</span>
+      </div>
     </div>
     <div class="tap-hint">Touchez pour ouvrir</div>
   </div>
