@@ -74,15 +74,9 @@ img{max-width:100%;display:block}
 }
 .intro-photo{
   flex:none;width:min(100vw,500px);height:clamp(270px,46vh,470px);margin-bottom:-58px;
-  background:url('intro-couple.jpg') 50% 16%/cover no-repeat;
-  -webkit-mask-image:
-    linear-gradient(to bottom, transparent 0%, #000 17%, #000 56%, transparent 97%),
-    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
-  -webkit-mask-composite:source-in;
-  mask-image:
-    linear-gradient(to bottom, transparent 0%, #000 17%, #000 56%, transparent 97%),
-    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
-  mask-composite:intersect;
+  background:url('intro-couple.png') 50% 16%/cover no-repeat;
+  -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 58%, transparent 97%);
+  mask-image:linear-gradient(to bottom, #000 0%, #000 58%, transparent 97%);
 }
 .intro-flower{
   position:absolute;width:clamp(80px,20vw,150px);z-index:1;
