@@ -59,19 +59,10 @@ img{max-width:100%;display:block}
 .intro{
   position:fixed;inset:0;z-index:100;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
-  background:
-    radial-gradient(55% 40% at 15% 8%, rgba(255,255,255,.55), transparent 60%),
-    radial-gradient(50% 40% at 85% 12%, rgba(255,255,255,.4), transparent 65%),
-    radial-gradient(70% 60% at 50% 105%, rgba(216,150,150,.3), transparent 70%),
-    radial-gradient(120% 120% at 50% 20%, #fdeae5 0%, #f6d2c9 55%, #edb9ae 100%);
+  background:var(--ivory);
   transition:opacity 1s ease, visibility 1s ease;
 }
 .intro.open{opacity:0;visibility:hidden;pointer-events:none}
-
-.intro-tint{
-  position:absolute;inset:0;z-index:0;mix-blend-mode:multiply;
-  background:radial-gradient(120% 100% at 50% 25%, rgba(196,30,60,.1) 0%, rgba(160,20,48,.15) 55%, rgba(110,15,35,.24) 100%);
-}
 .intro-photo{
   flex:none;width:min(100vw,500px);height:clamp(270px,46vh,470px);margin-bottom:-58px;
   background:url('intro-couple.png') 50% 16%/cover no-repeat;
@@ -86,13 +77,13 @@ img{max-width:100%;display:block}
 .intro-flower-bottom-right{bottom:-4%;right:-3%;transform:scaleX(-1)}
 
 .intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;padding-top:clamp(26px,5.5vh,60px);width:100%}
-.im-eyebrow{font-family:var(--display);letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--wine);text-shadow:0 2px 16px var(--ivory),0 0 6px var(--ivory)}
+.im-eyebrow{font-family:var(--display);letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--gold-light);text-shadow:0 2px 12px rgba(41,9,15,.7)}
 .im-names{
   position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
-  gap:.2em .35em;margin:.2em 0 .5em;text-shadow:0 4px 22px var(--ivory),0 0 10px var(--ivory);
+  gap:.2em .35em;margin:.2em 0 .5em;text-shadow:0 4px 18px rgba(41,9,15,.75);
 }
-.im-names .im-name{font-family:var(--script);font-size:clamp(2rem,9.5vw,3.2rem);color:var(--wine);line-height:1}
-.im-names .im-and{font-family:var(--display);font-style:italic;font-size:clamp(1rem,3vw,1.3rem);color:var(--wine-soft)}
+.im-names .im-name{font-family:var(--script);font-size:clamp(2rem,9.5vw,3.2rem);color:var(--gold-light);line-height:1}
+.im-names .im-and{font-family:var(--display);font-style:italic;font-size:clamp(1rem,3vw,1.3rem);color:var(--gold)}
 .im-names .im-rose{
   width:clamp(30px,7vw,42px);height:clamp(30px,7vw,42px);border-radius:50%;
   overflow:hidden;flex:none;box-shadow:0 3px 10px rgba(66,15,24,.3);
@@ -159,7 +150,7 @@ img{max-width:100%;display:block}
 .tap-hint{
   margin-top:26px;text-align:center;position:relative;z-index:11;
   font-family:var(--display);letter-spacing:.28em;text-transform:uppercase;
-  font-size:.72rem;color:var(--wine);animation:pulse 2.2s ease-in-out infinite;
+  font-size:.72rem;color:var(--gold-light);animation:pulse 2.2s ease-in-out infinite;
 }
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 
@@ -375,7 +366,8 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
 
 <!-- ===== INTRO ENVELOPE ===== -->
 <div class="intro" id="intro" role="button" tabindex="0" aria-label="Ouvrir le faire-part">
-  <div class="intro-tint" aria-hidden="true"></div>
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-overlay" aria-hidden="true"></div>
   <img class="intro-flower intro-flower-bottom-left" src="flower-corner.png" alt="" aria-hidden="true">
   <img class="intro-flower intro-flower-bottom-right" src="flower-corner.png" alt="" aria-hidden="true">
   <div class="intro-content">
@@ -681,7 +673,7 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
 
 <!-- ===== FOOTER ===== -->
 <footer>
-  <div class="footer-photo"><img src="eric-raissa.jpeg" alt="Raïssa et Eric"></div>
+ 
   <div class="names">Raïssa &amp; Eric</div>
   <div class="small">19 décembre 2026 · Yaoundé</div>
 </footer>
