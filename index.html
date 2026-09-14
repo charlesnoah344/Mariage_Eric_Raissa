@@ -68,20 +68,21 @@ img{max-width:100%;display:block}
 }
 .intro.open{opacity:0;visibility:hidden;pointer-events:none}
 
-.intro-photo{
-  position:absolute;inset:0;z-index:0;
-  background:url('eric-raissa-blend.jpg') center 30%/104% auto no-repeat;
-  filter:contrast(.98) saturate(1.08) brightness(1.04);
-  -webkit-mask-image:radial-gradient(68% 32% at 50% 16%, #000 0%, #000 50%, transparent 88%);
-  mask-image:radial-gradient(68% 32% at 50% 16%, #000 0%, #000 50%, transparent 88%);
-}
 .intro-tint{
-  position:absolute;inset:0;z-index:1;mix-blend-mode:multiply;
-  background:radial-gradient(120% 100% at 50% 25%, rgba(196,30,60,.14) 0%, rgba(160,20,48,.2) 55%, rgba(110,15,35,.28) 100%);
+  position:absolute;inset:0;z-index:0;mix-blend-mode:multiply;
+  background:radial-gradient(120% 100% at 50% 25%, rgba(196,30,60,.1) 0%, rgba(160,20,48,.15) 55%, rgba(110,15,35,.24) 100%);
 }
-.intro-glow{
-  position:absolute;inset:0;z-index:1;
-  background:radial-gradient(48% 36% at 50% 15%, transparent 40%, rgba(253,234,229,.9) 88%);
+.intro-photo{
+  flex:none;width:min(100vw,500px);height:clamp(270px,46vh,470px);margin-bottom:-58px;
+  background:url('intro-couple.jpg') 50% 16%/cover no-repeat;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 17%, #000 56%, transparent 97%),
+    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 17%, #000 56%, transparent 97%),
+    linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  mask-composite:intersect;
 }
 .intro-flower{
   position:absolute;width:clamp(80px,20vw,150px);z-index:1;
@@ -90,7 +91,7 @@ img{max-width:100%;display:block}
 .intro-flower-bottom-left{bottom:-4%;left:-3%}
 .intro-flower-bottom-right{bottom:-4%;right:-3%;transform:scaleX(-1)}
 
-.intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;padding-top:clamp(130px,30vh,195px);width:100%}
+.intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;padding-top:clamp(4px,1.5vh,16px);width:100%}
 .im-eyebrow{font-family:var(--display);letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--wine);text-shadow:0 2px 16px var(--ivory),0 0 6px var(--ivory)}
 .im-names{
   position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
@@ -380,12 +381,11 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
 
 <!-- ===== INTRO ENVELOPE ===== -->
 <div class="intro" id="intro" role="button" tabindex="0" aria-label="Ouvrir le faire-part">
-  <div class="intro-photo" aria-hidden="true"></div>
   <div class="intro-tint" aria-hidden="true"></div>
-  <div class="intro-glow" aria-hidden="true"></div>
   <img class="intro-flower intro-flower-bottom-left" src="flower-corner.png" alt="" aria-hidden="true">
   <img class="intro-flower intro-flower-bottom-right" src="flower-corner.png" alt="" aria-hidden="true">
   <div class="intro-content">
+    <div class="intro-photo" role="img" aria-label="Raïssa et Eric"></div>
     <p class="im-eyebrow">Notre mariage</p>
     <p class="im-names">
       <span class="im-name">Raïssa</span>
