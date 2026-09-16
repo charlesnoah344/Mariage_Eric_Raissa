@@ -8,18 +8,17 @@
 
 <!-- Aperçu de lien (WhatsApp, Facebook, iMessage…) -->
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://invitation-mariage-raissa-eric.netlify.app/og-image-square.jpg">
-<meta property="og:image:secure_url" content="https://invitation-mariage-raissa-eric.netlify.app/og-image-square.jpg">
+<meta property="og:title" content="&#8203;">
+<meta property="og:description" content="&#8203;">
+<meta property="og:image" content="https://invitation-mariage-raissa-eric.netlify.app/og-invitation.jpg">
+<meta property="og:image:secure_url" content="https://invitation-mariage-raissa-eric.netlify.app/og-invitation.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="1200">
-<meta property="og:image:alt" >
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="https://invitation-mariage-raissa-eric.netlify.app/">
 <meta property="og:locale" content="fr_FR">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" >
-<meta name="twitter:description" >
-<meta name="twitter:image" content="https://invitation-mariage-raissa-eric.netlify.app/og-image-square.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://invitation-mariage-raissa-eric.netlify.app/og-invitation.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,7 +64,7 @@ img{max-width:100%;display:block}
 }
 .intro.open{opacity:0;visibility:hidden;pointer-events:none}
 .intro-photo{
-  flex:none;width:min(100vw,500px);height:clamp(270px,46vh,470px);margin-bottom:-58px;
+  flex:none;width:min(100vw,500px);height:clamp(240px,43vh,470px);margin-bottom:-58px;
   background:url('intro-couple.png') 50% 16%/cover no-repeat;
   -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 58%, transparent 97%);
   mask-image:linear-gradient(to bottom, #000 0%, #000 58%, transparent 97%);
@@ -77,7 +76,7 @@ img{max-width:100%;display:block}
 .intro-flower-bottom-left{bottom:-4%;left:-3%}
 .intro-flower-bottom-right{bottom:-4%;right:-3%;transform:scaleX(-1)}
 
-.intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;padding-top:clamp(26px,5.5vh,60px);width:100%}
+.intro-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding:24px;padding-top:clamp(26px,5.5vh,60px);padding-bottom:clamp(24px,8vh,90px);width:100%}
 .im-eyebrow{font-family:var(--display);letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--gold-light);text-shadow:0 2px 12px rgba(41,9,15,.7)}
 .im-names{
   position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
@@ -92,7 +91,7 @@ img{max-width:100%;display:block}
 }
 
 .envelope{
-  position:relative;width:min(78vw,340px);aspect-ratio:3/2;
+  position:relative;width:min(78vw,340px,36vh);aspect-ratio:3/2;
   margin-top:clamp(14px,3vh,32px);
   cursor:pointer;
   filter:drop-shadow(0 30px 46px rgba(40,8,14,.45));
@@ -149,7 +148,7 @@ img{max-width:100%;display:block}
 .intro.animating .seal{transform:translate(-50%,-50%) scale(.2);opacity:0}
 
 .tap-hint{
-  margin-top:26px;text-align:center;position:relative;z-index:11;
+  margin-top:18px;text-align:center;position:relative;z-index:11;
   font-family:var(--display);letter-spacing:.28em;text-transform:uppercase;
   font-size:.72rem;color:var(--gold-light);animation:pulse 2.2s ease-in-out infinite;
 }
@@ -490,7 +489,7 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
       <div class="card">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h4l-.5 6a1.5 1.5 0 0 1-3 0L7 3ZM17 5h3l-.5 5a1.2 1.2 0 0 1-2.4 0L17 5ZM8.5 9v9M8.5 18h3M18 10v8M18 18h2.5"/></svg></div>
         <h3>Vin d'honneur</h3>
-        <div class="time">17 h 00</div>
+        <div class="time">16 h 00</div>
         <p>Nyom II<br>Yaoundé</p>
         <button type="button" class="card-btn" data-open-modal="vinModal">Voir le programme</button>
         <a href="https://www.google.com/maps/search/?api=1&query=Nyom%20II%20Yaound%C3%A9" target="_blank" rel="noopener">Voir l'itinéraire</a>
@@ -514,11 +513,11 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
     <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h4l-.5 6a1.5 1.5 0 0 1-3 0L7 3ZM17 5h3l-.5 5a1.2 1.2 0 0 1-2.4 0L17 5ZM8.5 9v9M8.5 18h3M18 10v8M18 18h2.5"/></svg></div>
     <h3>Programme du vin d'honneur</h3>
     <ul class="evening-list">
-      <li><span class="t">17h00</span><span>Arrivée des Mariés &amp; Accueil des Invités</span></li>
-      <li><span class="t">17h00–17h30</span><span>Moment de Partage &amp; Photos avec les Invités</span></li>
-      <li><span class="t">17h30</span><span>Cocktail &amp; Dégustation</span></li>
-      <li><span class="t">18h00</span><span>Ouverture du Dîner</span></li>
-      <li><span class="t">Dès 19h00</span><span>Grande Soirée Dansante, Musique &amp; Animations jusqu'à l'Aube</span></li>
+      <li><span class="t">16h00</span><span>Arrivée des Invités</span></li>
+      <li><span class="t">16h00–16h30</span><span>Arrivée des Mariés</span></li>
+      <li><span class="t">16h30–17h00</span><span>Moment de Partage &amp; Photos avec les Invités</span></li>
+      <li><span class="t">17h00</span><span>Cocktail &amp; Ouverture du Dîner</span></li>
+      <li><span class="t">18h00</span><span>Animation jusqu'au lendemain&nbsp;: live Mendjang…</span></li>
     </ul>
   </div>
 </dialog>
@@ -531,10 +530,8 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
     <ul class="evening-list">
       <li><span class="t">07h30</span><span>Arrivée des Mariés</span></li>
       <li><span class="t">08h00</span><span>Entrée des Mariés &amp; Ouverture de la Cérémonie</span></li>
-      <li><span class="t">08h00–09h00</span><span>Célébration Officielle du Mariage</span></li>
-      <li><span class="t">09h00</span><span>Fin de la Cérémonie</span></li>
-      <li><span class="t">09h00–11h30</span><span>Séance Photos des Mariés &amp; des Invités</span></li>
-      <li><span class="t">11h30</span><span>Fin de la Séance Photos</span></li>
+      <li><span class="t">08h00–09h00</span><span>Célébration du Mariage</span></li>
+      <li><span class="t">09h00–10h30</span><span>Séance Photos des Mariés &amp; des Invités</span></li>
     </ul>
   </div>
 </dialog>
@@ -547,16 +544,14 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
     <ul class="evening-list">
       <li><span class="t">12h30</span><span>Arrivée des Mariés</span></li>
       <li><span class="t">13h00</span><span>Entrée des Mariés &amp; Début de la Célébration</span></li>
-      <li><span class="t">13h00–13h30</span><span>Messe de Mariage</span></li>
-      <li><span class="t">13h30</span><span>Fin de la Célébration</span></li>
-      <li><span class="t">13h45–16h00</span><span>Séance Photos des Mariés</span></li>
+      <li><span class="t">14h30</span><span>Fin de la Célébration</span></li>
+      <li><span class="t">14h30–16h00</span><span>Séance Photos des Mariés &amp; des Invités</span></li>
     </ul>
     <p class="modal-subhead">Lieux de la séance photos</p>
     <ul class="pin-list">
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Rond-Point Bastos</span></li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Carrefour Hôtel de Ville</span></li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Bois Sainte-Anastasie</span></li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Monument «&nbsp;J'aime mon pays, le Cameroun&nbsp;»</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-7.5 7-12a7 7 0 1 0-14 0c0 4.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Carrefour Hôtel de Ville</span></li>
     </ul>
   </div>
 </dialog>
@@ -629,7 +624,8 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
       <div class="card">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 6.5 6.5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A18 18 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"/></svg></div>
         <h3>Contact</h3>
-        <p>Une question&nbsp;? Écrivez-nous au <strong>+32 465 34 72 56</strong></p>
+        <p>Une question&nbsp;? Écrivez-nous au <strong style="white-space:nowrap">+32 465 34 72 56</strong></p>
+        <a href="https://wa.me/32465347256" target="_blank" rel="noopener">Écrire sur WhatsApp</a>
       </div>
       <div class="card">
         <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3v11H4Z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
