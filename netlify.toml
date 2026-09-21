@@ -1,0 +1,6 @@
+# Génère config.js au moment du déploiement, à partir des variables d'environnement
+# Netlify (Site configuration > Environment variables) : SCRIPT_URL et RSVP_TOKEN.
+# Ainsi l'URL du script reste hors du dépôt git, tout en étant servie au site.
+[build]
+  publish = "."
+  command = "./build-config.sh"
