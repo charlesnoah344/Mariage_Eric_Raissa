@@ -63,8 +63,11 @@ img{max-width:100%;display:block}
   transition:opacity 1s ease, visibility 1s ease;
 }
 .intro.open{opacity:0;visibility:hidden;pointer-events:none}
+/* cadre doré, comme sur la page d'accueil */
+.intro::before{content:"";position:absolute;inset:18px;border:1px solid rgba(193,151,78,.6);pointer-events:none;z-index:3}
+.intro::after{content:"";position:absolute;inset:24px;border:1px solid rgba(193,151,78,.25);pointer-events:none;z-index:3}
 .intro-photo{
-  flex:none;width:min(100vw,500px);height:clamp(250px,45vh,480px);margin-bottom:-18px;
+  flex:none;width:min(100vw,600px);height:clamp(300px,54vh,576px);margin-bottom:-22px;
   background:url('intro-couple.png') 50% 0/contain no-repeat;
   -webkit-mask-image:linear-gradient(to bottom, #000 0%, #000 63%, transparent 96%);
   mask-image:linear-gradient(to bottom, #000 0%, #000 63%, transparent 96%);
@@ -153,6 +156,13 @@ img{max-width:100%;display:block}
   font-size:.72rem;color:var(--gold-light);animation:pulse 2.2s ease-in-out infinite;
 }
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* écrans courts : on garde l'enveloppe au-dessus des roses */
+@media (max-height:720px){
+  .intro-photo{height:clamp(230px,40vh,360px);margin-bottom:-14px}
+  .envelope{width:min(72vw,300px,32vh);margin-top:10px}
+  .tap-hint{margin-top:12px}
+}
 
 /* ============ SOUND TOGGLE ============ */
 .sound-toggle{
