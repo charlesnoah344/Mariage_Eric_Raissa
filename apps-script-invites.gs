@@ -98,7 +98,7 @@ function genererLiensManquants() {
     if (token) {
       // Lien déjà généré : on le laisse intact, on répare seulement une URL manquante.
       tokens.push([token]);
-      liens.push([String(ligne[COL_LIEN - 1]).trim() || lienPour(token)]);
+      liens.push([String(ligne[COL_LIEN - 1]).trim() || lienPour(token, ligne[COL_PRENOM - 1])]);
       return;
     }
 
@@ -113,7 +113,7 @@ function genererLiensManquants() {
     token = nouveauToken(tokensUtilises);
     tokensUtilises[token] = true;
     tokens.push([token]);
-    liens.push([lienPour(token)]);
+    liens.push([lienPour(token, ligne[COL_PRENOM - 1])]);
     generes++;
   });
 
@@ -132,8 +132,12 @@ function genererLiensManquants() {
   ui.alert(message);
 }
 
-function lienPour(token) {
-  return SITE_URL + '?i=' + token;
+function lienPour(token, prenom) {
+  // Le prénom voyage dans le lien pour que l'invité voie « Bonjour X » immédiatement,
+  // sans attendre la réponse du serveur. Il reste purement décoratif : c'est le token
+  // qui identifie l'invitation et lui seul permet de répondre.
+  const p = String(prenom || '').trim();
+  return SITE_URL + '?i=' + token + (p ? '&n=' + encodeURIComponent(p) : '');
 }
 
 function nouveauToken(dejaUtilises) {
