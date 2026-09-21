@@ -1,52 +1,118 @@
 /**
- * Backend RSVP gratuit pour le site de mariage — Google Sheets + Apps Script.
+ * Backend du faire-part — Raïssa & Eric.
+ * Lit et écrit dans la feuille « Invités » (voir apps-script-invites.gs pour la créer).
  *
- * INSTALLATION (5 minutes) :
- * 1. Créez un Google Sheet (ex: "RSVP Mariage Raïssa & Eric").
- *    Sur la 1ère ligne, mettez les en-têtes : Date | Nom | Réponse | Nombre | Message
- * 2. Dans ce Sheet : Extensions > Apps Script.
- * 3. Supprimez le code par défaut, collez tout le contenu de ce fichier.
- * 4. Remplacez TOKEN ci-dessous par la même valeur que RSVP_TOKEN dans config.js
- *    (protège contre le spam si quelqu'un retrouve l'URL du script).
- * 5. Cliquez sur "Déployer" > "Nouveau déploiement" > type "Application Web".
- *    - Exécuter en tant que : Moi
- *    - Qui a accès : Tout le monde
- * 6. Autorisez l'accès, copiez l'URL qui se termine par /exec.
- *    Collez cette URL dans config.js (voir config.example.js à la racine du site).
+ * INSTALLATION
+ * 1. Google Sheet > Extensions > Apps Script.
+ * 2. Remplacez tout le contenu du fichier "Code.gs" par ce fichier.
+ * 3. API_AUTH ci-dessous doit être identique à RSVP_TOKEN dans config.js.
+ * 4. Déployer > Gérer les déploiements > (crayon) > Version : "Nouvelle version" > Déployer.
+ *    Exécuter en tant que : Moi — Qui a accès : Tout le monde.
+ *    L'URL /exec ne change pas si vous mettez à jour le déploiement existant.
  *
- * Pour relire les réponses : ouvrez simplement le Google Sheet, il se remplit en direct.
- * Pour un total en direct (ex: "247 / 300 invités confirmés"), ajoutez une formule
- * dans une cellule à part, ex: =SOMME(D2:D1000) (colonne "Nombre").
+ * Deux points d'entrée :
+ *   GET  ?action=invitation&auth=…&i=TOKEN   → les infos de l'invité (prénom, places, réponse)
+ *   POST action=rsvp&auth=…&i=TOKEN&…        → enregistre la réponse dans SA ligne
+ *
+ * Sans token valide, aucune réponse n'est acceptée : seuls les invités de la liste peuvent confirmer.
  */
 
-const TOKEN = 'b7dabfc3a8ec4122a10699e52fb740e7'; // doit correspondre à RSVP_TOKEN dans config.js
+const API_AUTH = 'b7dabfc3a8ec4122a10699e52fb740e7'; // = RSVP_TOKEN dans config.js
+const API_FEUILLE = 'Invités';
 
-function doPost(e) {
-  const p = e.parameter;
+const C_PRENOM = 1, C_NOM = 2, C_PLACES = 4, C_TOKEN = 5,
+      C_STATUT = 7, C_PLACES_OK = 8, C_REPONDU = 9, C_MESSAGE = 12;
+const NB_COLONNES = 12;
 
-  if (p.token !== TOKEN) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ result: 'error', message: 'invalid token' }))
-      .setMimeType(ContentService.MimeType.JSON);
+const STATUT_PRESENT = 'Présent(e)';
+const STATUT_ABSENT  = 'Absent(e)';
+
+function doGet(e) {
+  const p = (e && e.parameter) || {};
+
+  if (p.action !== 'invitation') {
+    return ContentService.createTextOutput('Le backend du faire-part fonctionne ✔');
   }
+  if (p.auth !== API_AUTH) return json({ ok: false, message: 'auth' });
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  sheet.appendRow([
-    new Date(),
-    p.nom || '',
-    p.reponse || '',
-    Number(p.nombre) || 1,
-    p.message || ''
-  ]);
+  const invite = trouverInvite(String(p.i || '').trim());
+  if (!invite) return json({ ok: false, message: 'inconnu' });
 
-  return ContentService
-    .createTextOutput(JSON.stringify({ result: 'ok' }))
-    .setMimeType(ContentService.MimeType.JSON);
+  const l = invite.valeurs;
+  const statut = String(l[C_STATUT - 1]).trim();
+
+  return json({
+    ok: true,
+    prenom: String(l[C_PRENOM - 1]).trim(),
+    nom: String(l[C_NOM - 1]).trim(),
+    places: Number(l[C_PLACES - 1]) || 1,
+    statut: statut,
+    present: statut === STATUT_PRESENT ? 'oui' : (statut === STATUT_ABSENT ? 'non' : ''),
+    placesConfirmees: Number(l[C_PLACES_OK - 1]) || 0,
+    message: String(l[C_MESSAGE - 1] || '').trim()
+  });
 }
 
-// Pratique pour vérifier que le déploiement fonctionne (ouvrez l'URL /exec dans un navigateur)
-function doGet(e) {
+function doPost(e) {
+  const p = (e && e.parameter) || {};
+
+  if (p.auth !== API_AUTH) return json({ ok: false, message: 'auth' });
+
+  const token = String(p.i || '').trim();
+  if (!token) return json({ ok: false, message: 'token' });
+
+  const verrou = LockService.getScriptLock();
+  try {
+    verrou.waitLock(20000); // deux invités qui répondent en même temps ne s'écrasent pas
+  } catch (err) {
+    return json({ ok: false, message: 'occupe' });
+  }
+
+  try {
+    const invite = trouverInvite(token);
+    if (!invite) return json({ ok: false, message: 'inconnu' });
+
+    const places = Number(invite.valeurs[C_PLACES - 1]) || 1;
+    const present = String(p.reponse || '') === 'oui';
+    const nombre = present ? Math.max(1, Math.min(Number(p.nombre) || 1, places)) : 0;
+
+    const feuille = invite.feuille, ligne = invite.ligne;
+    feuille.getRange(ligne, C_STATUT).setValue(present ? STATUT_PRESENT : STATUT_ABSENT);
+    feuille.getRange(ligne, C_PLACES_OK).setValue(nombre);
+    feuille.getRange(ligne, C_REPONDU).setValue(new Date());
+    feuille.getRange(ligne, C_MESSAGE).setValue(String(p.message || '').trim());
+    SpreadsheetApp.flush();
+
+    return json({
+      ok: true,
+      prenom: String(invite.valeurs[C_PRENOM - 1]).trim(),
+      placesConfirmees: nombre
+    });
+  } finally {
+    verrou.releaseLock();
+  }
+}
+
+function trouverInvite(token) {
+  if (!token) return null;
+
+  const feuille = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(API_FEUILLE);
+  if (!feuille) return null;
+
+  const nbLignes = feuille.getLastRow() - 1;
+  if (nbLignes < 1) return null;
+
+  const valeurs = feuille.getRange(2, 1, nbLignes, NB_COLONNES).getValues();
+  for (let i = 0; i < valeurs.length; i++) {
+    if (String(valeurs[i][C_TOKEN - 1]).trim() === token) {
+      return { feuille: feuille, ligne: i + 2, valeurs: valeurs[i] };
+    }
+  }
+  return null;
+}
+
+function json(objet) {
   return ContentService
-    .createTextOutput('Le backend RSVP fonctionne ✔')
-    .setMimeType(ContentService.MimeType.TEXT);
+    .createTextOutput(JSON.stringify(objet))
+    .setMimeType(ContentService.MimeType.JSON);
 }

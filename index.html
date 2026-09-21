@@ -338,6 +338,7 @@ h2{font-family:var(--display);font-weight:500;font-size:clamp(2rem,6vw,3rem);col
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.7;cursor:default}
 .form-note{text-align:center;font-size:.82rem;color:var(--gold-deep);margin-top:14px}
+.invite-hello{font-family:var(--display);font-style:italic;font-size:1.15rem;color:var(--wine);margin-bottom:14px}
 .rsvp-fields{opacity:0;max-height:0;overflow:hidden;transition:opacity .5s ease, max-height .6s ease}
 .rsvp-fields.open{opacity:1;max-height:900px}
 
@@ -645,18 +646,20 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
     <h2>Serez-vous des nôtres&nbsp;?</h2>
     <div class="divider"></div>
     <div class="form">
-      <button class="btn" id="toggleForm" type="button">Remplir le formulaire</button>
+      <p class="invite-hello" id="inviteHello" hidden></p>
+      <p class="form-note" id="inviteState">Chargement de votre invitation…</p>
+      <button class="btn" id="toggleForm" type="button" hidden>Remplir le formulaire</button>
       <div id="rsvpFields" class="rsvp-fields" hidden>
         <label for="nom">Nom &amp; prénom</label>
-        <input id="nom" type="text" placeholder="Votre nom">
+        <input id="nom" type="text" readonly>
 
         <label for="rep">Votre réponse</label>
         <select id="rep">
-          <option value="Je serai présent(e) avec joie">Je viens avec joie</option>
-          <option value="Je ne pourrai malheureusement pas venir">Je ne pourrai pas venir</option>
+          <option value="oui">Je viens avec joie</option>
+          <option value="non">Je ne pourrai pas venir</option>
         </select>
 
-        <label for="nb">Nombre de personnes</label>
+        <label for="nb" id="nbLabel">Nombre de personnes</label>
         <input id="nb" type="number" min="1" value="1">
 
         <label for="msg">Un petit mot (facultatif)</label>
@@ -763,32 +766,99 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
     dialog.addEventListener('click', e=>{ if(e.target===dialog) dialog.close(); });
   });
 
-  /* ---- RSVP : révéler le formulaire au clic ---- */
+  /* ---- Invitation personnalisée (?i=TOKEN) + réponse ---- */
+  // SCRIPT_URL et RSVP_TOKEN viennent de config.js (non versionné — voir config.example.js)
+  const inviteToken = new URLSearchParams(location.search).get('i') || '';
+  const helloEl   = document.getElementById('inviteHello');
+  const stateEl   = document.getElementById('inviteState');
   const toggleBtn = document.getElementById('toggleForm');
-  const rsvpFields = document.getElementById('rsvpFields');
+  const rsvpFields= document.getElementById('rsvpFields');
+  const nomEl = document.getElementById('nom');
+  const repEl = document.getElementById('rep');
+  const nbEl  = document.getElementById('nb');
+  const nbLabel = document.getElementById('nbLabel');
+  const msgEl = document.getElementById('msg');
+  const btn = document.getElementById('send');
+  const statusEl = document.getElementById('status');
+  const apiPrete = typeof SCRIPT_URL === 'string' && SCRIPT_URL && typeof RSVP_TOKEN === 'string';
+
+  function verrouiller(texte){
+    stateEl.textContent = texte;
+    stateEl.hidden = false;
+    toggleBtn.hidden = true;
+  }
+
   toggleBtn.addEventListener('click', ()=>{
     rsvpFields.hidden = false;
     requestAnimationFrame(()=> rsvpFields.classList.add('open'));
     toggleBtn.hidden = true;
-    document.getElementById('nom').focus();
+    repEl.focus();
   });
 
-  /* ---- RSVP → Google Apps Script (gratuit, illimité) ---- */
-  // SCRIPT_URL et RSVP_TOKEN viennent de config.js (non versionné — voir config.example.js et apps-script.gs)
+  function appliquerInvitation(inv){
+    const prenom = (inv.prenom || inv.nom || '').trim();
+    if(prenom){
+      document.querySelectorAll('.im-eyebrow').forEach(el=> el.textContent = 'Bonjour ' + prenom);
+      helloEl.textContent = prenom + ', nous serions heureux de vous compter parmi nous.';
+      helloEl.hidden = false;
+    }
 
-  const btn = document.getElementById('send');
-  const statusEl = document.getElementById('status');
+    nomEl.value = [inv.prenom, inv.nom].filter(Boolean).join(' ');
+
+    const places = Number(inv.places) > 0 ? Number(inv.places) : 1;
+    nbEl.max = places;
+    nbEl.value = Number(inv.placesConfirmees) > 0 ? inv.placesConfirmees : places;
+    nbLabel.textContent = places > 1
+      ? 'Nombre de personnes (' + places + ' places réservées)'
+      : 'Nombre de personnes';
+
+    if(inv.present) repEl.value = inv.present;
+    if(inv.message) msgEl.value = inv.message;
+
+    if(inv.statut){
+      stateEl.textContent = 'Réponse déjà enregistrée : ' + inv.statut + '. Vous pouvez la modifier.';
+      stateEl.hidden = false;
+      toggleBtn.textContent = 'Modifier ma réponse';
+    }else{
+      stateEl.hidden = true;
+    }
+    toggleBtn.hidden = false;
+  }
+
+  async function chargerInvitation(){
+    if(!inviteToken){
+      verrouiller('Votre lien personnel vous a été envoyé par message : ouvrez-le pour répondre.');
+      return;
+    }
+    if(!apiPrete){
+      verrouiller('Les réponses sont momentanément indisponibles.');
+      return;
+    }
+    try{
+      const url = SCRIPT_URL + '?action=invitation&auth=' + encodeURIComponent(RSVP_TOKEN) +
+                  '&i=' + encodeURIComponent(inviteToken);
+      const reponse = await fetch(url);
+      const data = await reponse.json();
+      if(!data.ok){
+        verrouiller('Ce lien n’est pas reconnu. Vérifiez le message reçu ou contactez-nous.');
+        return;
+      }
+      appliquerInvitation(data);
+    }catch(err){
+      verrouiller('Connexion impossible pour le moment. Réessayez dans un instant.');
+    }
+  }
 
   btn.addEventListener('click', async ()=>{
-    const nom = document.getElementById('nom').value.trim();
-    if(!nom){ statusEl.textContent = 'Merci d’indiquer votre nom.'; return; }
+    if(!inviteToken || !apiPrete) return;
 
     const data = new URLSearchParams({
-      nom,
-      reponse: document.getElementById('rep').value,
-      nombre:  document.getElementById('nb').value || '1',
-      message: document.getElementById('msg').value.trim(),
-      token: RSVP_TOKEN
+      action: 'rsvp',
+      auth: RSVP_TOKEN,
+      i: inviteToken,
+      reponse: repEl.value,
+      nombre: nbEl.value || '1',
+      message: msgEl.value.trim()
     });
 
     btn.disabled = true;
@@ -796,8 +866,12 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
     statusEl.textContent = '';
 
     try{
-      await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body:data });
-      statusEl.textContent = 'Merci ! Votre réponse a bien été enregistrée.';
+      const reponse = await fetch(SCRIPT_URL, { method:'POST', body:data });
+      const res = await reponse.json();
+      if(!res.ok) throw new Error(res.message || 'refus');
+      statusEl.textContent = repEl.value === 'oui'
+        ? 'Merci ! Votre présence est enregistrée.'
+        : 'Merci pour votre réponse, vous nous manquerez.';
       btn.textContent = 'Réponse envoyée';
     }catch(err){
       statusEl.textContent = 'Oups, l’envoi a échoué. Réessayez dans un instant.';
@@ -805,6 +879,8 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
       btn.textContent = 'Envoyer ma réponse';
     }
   });
+
+  chargerInvitation();
 })();
 </script>
 </body>
