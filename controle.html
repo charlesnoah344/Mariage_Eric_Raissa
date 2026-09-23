@@ -140,12 +140,25 @@ button:disabled{opacity:.5;cursor:default}
     const reponse = methode === 'POST'
       ? await fetch(SCRIPT_URL, { method: 'POST', body: corps })
       : await fetch(SCRIPT_URL + '?' + corps.toString());
-    return reponse.json();
+
+    const texte = await reponse.text();
+    try {
+      return JSON.parse(texte);
+    } catch (err) {
+      // Reponse en texte : c'est l'ancien script qui repond encore.
+      const vieux = new Error('ancien');
+      vieux.reponse = texte.slice(0, 120);
+      throw vieux;
+    }
   }
 
   async function chargerListe() {
     const data = await api({ action: 'liste' }, 'GET');
-    if (!data.ok) throw new Error(data.message || 'refus');
+    if (!data.ok) {
+      const refus = new Error(data.message || 'refus');
+      refus.code = data.message;
+      throw refus;
+    }
     liste = data.invites || [];
     ecrire(CLE_LISTE, liste);
     return liste;
@@ -325,7 +338,16 @@ button:disabled{opacity:.5;cursor:default}
         ouvrirControle();
         $('aideScan').textContent = 'Liste chargée depuis la mémoire de ce téléphone : le serveur est injoignable.';
       } else {
-        $('aideConnexion').textContent = 'Code refusé, ou serveur injoignable. Réessayez.';
+        if (err && err.message === 'ancien') {
+          $('aideConnexion').textContent = 'Le script Google répond, mais c’est encore l’ancienne version : '
+            + 'dans Apps Script, faites Déployer > Gérer les déploiements > crayon > Version : Nouvelle version.';
+        } else if (err && err.code === 'admin') {
+          $('aideConnexion').textContent = 'Code d’accès refusé. Vérifiez-le auprès des mariés.';
+        } else if (err && err.code === 'feuille') {
+          $('aideConnexion').textContent = 'Le script ne trouve pas la feuille « Invités » du tableur.';
+        } else {
+          $('aideConnexion').textContent = 'Serveur injoignable. Vérifiez la connexion, puis réessayez.';
+        }
         $('entrer').disabled = false;
       }
     }
