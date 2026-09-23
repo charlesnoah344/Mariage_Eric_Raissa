@@ -8,17 +8,17 @@
 
 <!-- Aperçu de lien (WhatsApp, Facebook, iMessage…) -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="&#8203;">
-<meta property="og:description" content="&#8203;">
-<meta property="og:image" content="https://invitation-mariage-raissa-eric.netlify.app/og-invitation.jpg">
-<meta property="og:image:secure_url" content="https://invitation-mariage-raissa-eric.netlify.app/og-invitation.jpg">
+<meta property="og:title" content="Raïssa &amp; Eric — Nous nous marions">
+<meta property="og:description" content="19 décembre 2026 · Yaoundé, Cameroun">
+<meta property="og:image" content="https://fairepart-mariage-raissa-eric.netlify.app/og-invitation.jpg">
+<meta property="og:image:secure_url" content="https://fairepart-mariage-raissa-eric.netlify.app/og-invitation.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:url" content="https://invitation-mariage-raissa-eric.netlify.app/">
+<meta property="og:url" content="https://fairepart-mariage-raissa-eric.netlify.app/">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://invitation-mariage-raissa-eric.netlify.app/og-invitation.jpg">
+<meta name="twitter:image" content="https://fairepart-mariage-raissa-eric.netlify.app/og-invitation.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,11 +84,6 @@ img{max-width:100%;display:block}
 }
 .im-names .im-name{font-family:var(--script);font-size:clamp(2rem,9.5vw,3.2rem);color:var(--gold-light);line-height:1}
 .im-names .im-and{font-family:var(--display);font-style:italic;font-size:clamp(1rem,3vw,1.3rem);color:var(--gold)}
-.im-invite{
-  font-family:var(--display);font-style:italic;
-  font-size:clamp(.95rem,3.6vw,1.2rem);color:var(--gold-light);
-  text-shadow:0 2px 14px rgba(41,9,15,.75);margin-top:2px;max-width:22em;
-}
 .im-names .im-rose{
   width:clamp(30px,7vw,42px);height:clamp(30px,7vw,42px);border-radius:50%;
   overflow:hidden;flex:none;box-shadow:0 3px 10px rgba(66,15,24,.3);
@@ -385,7 +380,6 @@ footer .small{font-family:var(--display);letter-spacing:.3em;text-transform:uppe
       <span class="im-and">et</span>
       <span class="im-name">Eric</span>
     </p>
-    <p class="im-invite" id="imInvite" hidden></p>
     <div class="envelope">
       <div class="env-body">
         <div class="env-sheen" aria-hidden="true"></div>
@@ -773,11 +767,7 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
 
   /* ---- Invitation personnalisée (?i=TOKEN) + réponse ---- */
   // SCRIPT_URL et RSVP_TOKEN viennent de config.js (non versionné — voir config.example.js)
-  const parametres = new URLSearchParams(location.search);
-  const inviteToken = parametres.get('i') || '';
-  // Le prénom voyage dans le lien : l'accueil s'affiche sans attendre le serveur,
-  // qui met parfois plusieurs secondes à répondre au premier appel.
-  const prenomDuLien = (parametres.get('n') || '').trim().slice(0, 40);
+  const inviteToken = new URLSearchParams(location.search).get('i') || '';
   const helloEl   = document.getElementById('inviteHello');
   const stateEl   = document.getElementById('inviteState');
   const toggleBtn = document.getElementById('toggleForm');
@@ -804,18 +794,12 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
     repEl.focus();
   });
 
-  function saluer(prenom){
-    if(!prenom) return;
-    document.querySelectorAll('.im-eyebrow').forEach(el=> el.textContent = 'Bonjour ' + prenom);
-    const inviteEl = document.getElementById('imInvite');
-    inviteEl.textContent = 'Nous vous invitons à notre mariage';
-    inviteEl.hidden = false;
-    helloEl.textContent = prenom + ', nous serions heureux de vous compter parmi nous.';
-    helloEl.hidden = false;
-  }
-
   function appliquerInvitation(inv){
-    saluer((inv.prenom || inv.nom || '').trim());
+    const prenom = (inv.prenom || inv.nom || '').trim();
+    if(prenom){
+      helloEl.textContent = prenom + ', nous serions heureux de vous compter parmi nous.';
+      helloEl.hidden = false;
+    }
 
     nomEl.value = [inv.prenom, inv.nom].filter(Boolean).join(' ');
 
@@ -848,8 +832,6 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
       verrouiller('Les réponses sont momentanément indisponibles.');
       return;
     }
-    saluer(prenomDuLien);
-
     // Reponse deja connue : on affiche aussi le formulaire sans attendre le serveur.
     try{
       const cache = localStorage.getItem('invite:' + inviteToken);

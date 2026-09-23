@@ -15,7 +15,7 @@
  * Un lien déjà généré n'est JAMAIS modifié : vous pouvez relancer sans risque.
  */
 
-const SITE_URL = 'https://invitation-mariage-raissa-eric.netlify.app/';
+const SITE_URL = 'https://fairepart-mariage-raissa-eric.netlify.app/';
 const FEUILLE_INVITES = 'Invités';
 
 const COLONNES = [
@@ -98,7 +98,7 @@ function genererLiensManquants() {
     if (token) {
       // Lien déjà généré : on le laisse intact, on répare seulement une URL manquante.
       tokens.push([token]);
-      liens.push([String(ligne[COL_LIEN - 1]).trim() || lienPour(token, ligne[COL_PRENOM - 1])]);
+      liens.push([String(ligne[COL_LIEN - 1]).trim() || lienPour(token)]);
       return;
     }
 
@@ -113,7 +113,7 @@ function genererLiensManquants() {
     token = nouveauToken(tokensUtilises);
     tokensUtilises[token] = true;
     tokens.push([token]);
-    liens.push([lienPour(token, ligne[COL_PRENOM - 1])]);
+    liens.push([lienPour(token)]);
     generes++;
   });
 
@@ -132,12 +132,8 @@ function genererLiensManquants() {
   ui.alert(message);
 }
 
-function lienPour(token, prenom) {
-  // Le prénom voyage dans le lien pour que l'invité voie « Bonjour X » immédiatement,
-  // sans attendre la réponse du serveur. Il reste purement décoratif : c'est le token
-  // qui identifie l'invitation et lui seul permet de répondre.
-  const p = String(prenom || '').trim();
-  return SITE_URL + '?i=' + token + (p ? '&n=' + encodeURIComponent(p) : '');
+function lienPour(token) {
+  return SITE_URL + '?i=' + token;
 }
 
 function nouveauToken(dejaUtilises) {
