@@ -88,6 +88,7 @@ button:disabled{opacity:.5;cursor:default}
 </div>
 
 <script src="config.js"></script>
+<script src="vendor/jsqr.js"></script>
 <script>
 (() => {
   'use strict';
@@ -228,42 +229,78 @@ button:disabled{opacity:.5;cursor:default}
   }
 
   /* ---- Caméra ---- */
-  let flux = null, detecteur = null, boucle = null;
+  let flux = null, detecteurNatif = null, boucle = null, minuteur = null;
+  const toile = document.createElement('canvas');
+  const pinceau = toile.getContext('2d', { willReadFrequently: true });
+
+  // Chrome sait lire les QR nativement ; Safari non, on passe alors par jsQR.
+  async function lireUneImage(video) {
+    if (detecteurNatif) {
+      const codes = await detecteurNatif.detect(video);
+      return codes.length ? codes[0].rawValue : null;
+    }
+    if (typeof jsQR !== 'function' || video.readyState < 2 || !video.videoWidth) return null;
+
+    const largeur = 480;
+    const hauteur = Math.round(video.videoHeight * (largeur / video.videoWidth)) || 360;
+    toile.width = largeur; toile.height = hauteur;
+    pinceau.drawImage(video, 0, 0, largeur, hauteur);
+    const image = pinceau.getImageData(0, 0, largeur, hauteur);
+    const code = jsQR(image.data, largeur, hauteur, { inversionAttempts: 'dontInvert' });
+    return code ? code.data : null;
+  }
 
   async function demarrerCamera() {
-    if (!('BarcodeDetector' in window)) {
-      $('aideScan').textContent = 'Ce navigateur ne sait pas lire les QR codes. Utilisez Chrome sur Android, ou saisissez le code du billet à la main (il est écrit sous le QR).';
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      $('aideScan').textContent = 'Ce navigateur ne donne pas accès à la caméra. Saisissez le code du billet à la main : il est écrit sous le QR.';
       return;
     }
     try {
-      flux = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      flux = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } }, audio: false
+      });
       const video = $('camera');
       video.srcObject = flux;
+      video.setAttribute('playsinline', '');   // sinon iPhone ouvre le lecteur plein écran
       video.classList.add('actif');
       await video.play();
 
-      detecteur = new BarcodeDetector({ formats: ['qr_code'] });
-      $('demarrer').textContent = 'Arrêter la caméra';
+      if ('BarcodeDetector' in window) {
+        try {
+          const formats = await window.BarcodeDetector.getSupportedFormats();
+          if (formats.includes('qr_code')) detecteurNatif = new window.BarcodeDetector({ formats: ['qr_code'] });
+        } catch (err) { detecteurNatif = null; }
+      }
 
-      const lireImage = async () => {
+      $('demarrer').textContent = 'Arrêter la caméra';
+      $('aideScan').textContent = 'Présentez le QR du billet devant la caméra.';
+
+      const tourner = async () => {
         if (!flux) return;
         try {
-          const codes = await detecteur.detect(video);
-          if (codes.length) await verifier(codes[0].rawValue);
+          const valeur = await lireUneImage(video);
+          if (valeur) await verifier(valeur);
         } catch (err) {}
-        boucle = requestAnimationFrame(lireImage);
+        minuteur = setTimeout(() => { boucle = requestAnimationFrame(tourner); }, 120);
       };
-      lireImage();
+      tourner();
+
     } catch (err) {
-      $('aideScan').textContent = 'Accès à la caméra refusé. Autorisez-le dans le navigateur, ou saisissez le code à la main.';
+      $('aideScan').textContent = (err && err.name === 'NotAllowedError')
+        ? 'Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur, ou saisissez le code à la main.'
+        : 'Caméra indisponible. Saisissez le code du billet à la main : il est écrit sous le QR.';
+      arreterCamera();
     }
   }
 
   function arreterCamera() {
     if (boucle) cancelAnimationFrame(boucle);
+    if (minuteur) clearTimeout(minuteur);
     if (flux) flux.getTracks().forEach(t => t.stop());
-    flux = null;
-    $('camera').classList.remove('actif');
+    flux = null; detecteurNatif = null;
+    const video = $('camera');
+    video.srcObject = null;
+    video.classList.remove('actif');
     $('demarrer').textContent = 'Démarrer la caméra';
   }
 
