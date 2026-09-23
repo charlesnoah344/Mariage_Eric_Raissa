@@ -343,6 +343,8 @@ button:disabled{opacity:.5;cursor:default}
             + 'dans Apps Script, faites Déployer > Gérer les déploiements > crayon > Version : Nouvelle version.';
         } else if (err && err.code === 'admin') {
           $('aideConnexion').textContent = 'Code d’accès refusé. Vérifiez-le auprès des mariés.';
+        } else if (err && err.code === 'auth') {
+          $('aideConnexion').textContent = 'Le site et le script Google n’ont pas la même clé (RSVP_TOKEN / API_AUTH).';
         } else if (err && err.code === 'feuille') {
           $('aideConnexion').textContent = 'Le script ne trouve pas la feuille « Invités » du tableur.';
         } else {

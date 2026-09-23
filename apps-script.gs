@@ -22,7 +22,7 @@ const API_FEUILLE = 'Invités';
 
 // Code tape par l'hote sur la page de controle. Il n'apparait nulle part dans le site :
 // changez-le par ce que vous voulez, et ne le communiquez qu'aux personnes a l'entree.
-const ADMIN_CODE = 'portail-19-12';
+const ADMIN_CODE = '19-12-2026';
 
 const C_PRENOM = 1, C_NOM = 2, C_PLACES = 4, C_TOKEN = 5,
       C_STATUT = 7, C_PLACES_OK = 8, C_REPONDU = 9,
@@ -152,7 +152,8 @@ function scanner(p) {
  * de fonctionner si le reseau lache a l'entree.
  */
 function listeInvites(p) {
-  if (p.auth !== API_AUTH || p.admin !== ADMIN_CODE) return json({ ok: false, message: 'admin' });
+  if (p.auth !== API_AUTH) return json({ ok: false, message: 'auth' });
+  if (p.admin !== ADMIN_CODE) return json({ ok: false, message: 'admin' });
 
   const feuille = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(API_FEUILLE);
   if (!feuille) return json({ ok: false, message: 'feuille' });

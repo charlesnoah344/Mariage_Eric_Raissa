@@ -98,7 +98,7 @@ function genererLiensManquants() {
     if (token) {
       // Lien déjà généré : on le laisse intact, on répare seulement une URL manquante.
       tokens.push([token]);
-      liens.push([String(ligne[COL_LIEN - 1]).trim() || lienPour(token)]);
+      liens.push([String(ligne[COL_LIEN - 1]).trim() || lienPour(token, ligne[COL_PRENOM - 1])]);
       return;
     }
 
@@ -113,7 +113,7 @@ function genererLiensManquants() {
     token = nouveauToken(tokensUtilises);
     tokensUtilises[token] = true;
     tokens.push([token]);
-    liens.push([lienPour(token)]);
+    liens.push([lienPour(token, ligne[COL_PRENOM - 1])]);
     generes++;
   });
 
@@ -132,8 +132,11 @@ function genererLiensManquants() {
   ui.alert(message);
 }
 
-function lienPour(token) {
-  return SITE_URL + '?i=' + token;
+function lienPour(token, prenom) {
+  // Le prenom voyage dans le lien : il sert uniquement a afficher « Bonjour X »
+  // dans l'apercu WhatsApp. C'est le token, et lui seul, qui identifie l'invitation.
+  const p = String(prenom || '').trim();
+  return SITE_URL + '?i=' + token + (p ? '&n=' + encodeURIComponent(p) : '');
 }
 
 function nouveauToken(dejaUtilises) {
