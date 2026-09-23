@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Contrôle des entrées — Raïssa & Eric</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wine:#5e1622; --wine-deep:#420f18; --gold:#c1974e; --gold-light:#e2c489;
+  --ivory:#fbf7f0; --paper:#fff; --ink:#3a2b2b;
+  --vert:#1f6b3f; --rouge:#a11b2b; --orange:#a6631a; --gris:#5b5b5b;
+  --display:'Cormorant Garamond',serif; --body:'Jost',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);background:var(--wine-deep);color:var(--ivory);min-height:100vh;font-weight:300}
+.wrap{max-width:520px;margin:0 auto;padding:20px 18px 40px}
+
+h1{font-family:var(--display);font-size:1.5rem;color:var(--gold-light);text-align:center;font-weight:600}
+.sous{text-align:center;font-size:.8rem;color:#d8bfa0;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+
+label{display:block;font-family:var(--display);letter-spacing:.14em;text-transform:uppercase;font-size:.74rem;color:var(--gold-light);margin:18px 0 6px}
+input{width:100%;padding:14px;border:1px solid var(--gold);border-radius:10px;background:rgba(255,255,255,.07);
+  color:var(--ivory);font-family:var(--body);font-size:1.1rem}
+input:focus{outline:2px solid var(--gold-light)}
+button{width:100%;margin-top:14px;padding:15px;border:none;border-radius:999px;cursor:pointer;
+  background:var(--gold);color:var(--wine-deep);font-family:var(--display);font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;font-size:.85rem}
+button.secondaire{background:transparent;color:var(--gold-light);border:1px solid var(--gold)}
+button:disabled{opacity:.5;cursor:default}
+
+#camera{width:100%;aspect-ratio:4/3;background:#000;border-radius:14px;object-fit:cover;margin-top:14px;display:none}
+#camera.actif{display:block}
+
+.resultat{margin-top:18px;border-radius:16px;padding:22px 18px;text-align:center;display:none}
+.resultat.visible{display:block}
+.resultat .etat{font-family:var(--display);font-size:1.5rem;font-weight:600}
+.resultat .nom{font-size:1.5rem;margin-top:6px;font-weight:500}
+.resultat .info{font-size:1rem;margin-top:6px;opacity:.9}
+.resultat.ok{background:var(--vert);color:#fff}
+.resultat.double{background:var(--rouge);color:#fff}
+.resultat.attention{background:var(--orange);color:#fff}
+.resultat.inconnu{background:var(--gris);color:#fff}
+
+.barre{display:flex;justify-content:space-between;gap:10px;margin-top:22px;font-size:.82rem;color:#d8bfa0;
+  border-top:1px solid rgba(226,196,137,.3);padding-top:12px}
+.aide{font-size:.82rem;color:#d8bfa0;margin-top:12px;line-height:1.6}
+.cache{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Contrôle des entrées</h1>
+  <p class="sous">Raïssa &amp; Eric · 19 décembre 2026</p>
+
+  <!-- 1. Code d'accès -->
+  <section id="connexion">
+    <label for="code">Code d'accès</label>
+    <input id="code" type="password" autocomplete="off" inputmode="text" placeholder="Code remis par les mariés">
+    <button id="entrer">Ouvrir le contrôle</button>
+    <p class="aide" id="aideConnexion"></p>
+  </section>
+
+  <!-- 2. Scan -->
+  <section id="controle" class="cache">
+    <button id="demarrer">Démarrer la caméra</button>
+    <video id="camera" playsinline muted></video>
+
+    <label for="manuel">Ou saisir le code du billet</label>
+    <input id="manuel" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="ex. vp3drjezh9">
+    <button id="valider" class="secondaire">Valider ce code</button>
+
+    <div class="resultat" id="resultat">
+      <div class="etat" id="resEtat"></div>
+      <div class="nom" id="resNom"></div>
+      <div class="info" id="resInfo"></div>
+    </div>
+
+    <div class="barre">
+      <span id="compteur">—</span>
+      <span id="reseau">—</span>
+    </div>
+    <p class="aide" id="aideScan"></p>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  const CLE_CODE = 'controle:code';
+  const CLE_LISTE = 'controle:liste';
+  const CLE_FILE = 'controle:file';
+
+  const $ = (id) => document.getElementById(id);
+  const apiPrete = typeof SCRIPT_URL === 'string' && SCRIPT_URL && typeof RSVP_TOKEN === 'string';
+
+  let codeAdmin = '';
+  let liste = [];        // secours hors ligne
+  let file = [];         // entrées à envoyer quand le réseau revient
+  let dernierScan = { token: '', at: 0 };
+
+  const lire = (cle, defaut) => {
+    try { const v = localStorage.getItem(cle); return v ? JSON.parse(v) : defaut; }
+    catch (err) { return defaut; }
+  };
+  const ecrire = (cle, valeur) => {
+    try { localStorage.setItem(cle, JSON.stringify(valeur)); } catch (err) {}
+  };
+
+  /* ---- Affichage ---- */
+  function afficher(classe, etat, nom, info) {
+    const boite = $('resultat');
+    boite.className = 'resultat visible ' + classe;
+    $('resEtat').textContent = etat;
+    $('resNom').textContent = nom || '';
+    $('resInfo').textContent = info || '';
+    if (navigator.vibrate) navigator.vibrate(classe === 'ok' ? 60 : [60, 60, 60]);
+  }
+
+  function majBarre() {
+    const entres = liste.filter(i => i.entree).length;
+    const attendus = liste.filter(i => i.statut === 'Présent(e)').length;
+    $('compteur').textContent = liste.length
+      ? entres + ' entrés · ' + attendus + ' confirmés'
+      : 'liste non chargée';
+    $('reseau').textContent = file.length
+      ? file.length + ' à synchroniser'
+      : (navigator.onLine ? 'en ligne' : 'hors ligne');
+  }
+
+  /* ---- Appels au serveur ---- */
+  async function api(params, methode) {
+    const corps = new URLSearchParams(Object.assign({ auth: RSVP_TOKEN, admin: codeAdmin }, params));
+    const reponse = methode === 'POST'
+      ? await fetch(SCRIPT_URL, { method: 'POST', body: corps })
+      : await fetch(SCRIPT_URL + '?' + corps.toString());
+    return reponse.json();
+  }
+
+  async function chargerListe() {
+    const data = await api({ action: 'liste' }, 'GET');
+    if (!data.ok) throw new Error(data.message || 'refus');
+    liste = data.invites || [];
+    ecrire(CLE_LISTE, liste);
+    return liste;
+  }
+
+  /* ---- Synchronisation de la file d'attente ---- */
+  async function viderFile() {
+    if (!file.length || !navigator.onLine) return;
+    const restants = [];
+    for (const item of file) {
+      try {
+        const data = await api({ action: 'scan', i: item.token }, 'POST');
+        if (!data.ok && data.message !== 'inconnu') restants.push(item);
+      } catch (err) { restants.push(item); }
+    }
+    file = restants;
+    ecrire(CLE_FILE, file);
+    majBarre();
+  }
+
+  /* ---- Cœur du contrôle ---- */
+  function marquerLocalement(token) {
+    const invite = liste.find(i => i.token === token);
+    if (invite) { invite.entree = true; ecrire(CLE_LISTE, liste); }
+    return invite;
+  }
+
+  function heure(valeur) {
+    const d = new Date(valeur);
+    return isNaN(d) ? '' : d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function verifier(token) {
+    token = String(token || '').trim().toLowerCase();
+    if (!token) return;
+
+    // Un même QR reste devant la caméra : on évite d'enchaîner les scans.
+    const maintenant = Date.now();
+    if (token === dernierScan.token && maintenant - dernierScan.at < 3000) return;
+    dernierScan = { token: token, at: maintenant };
+
+    try {
+      const data = await api({ action: 'scan', i: token }, 'POST');
+
+      if (!data.ok) {
+        if (data.message === 'admin') return afficher('inconnu', 'Code d’accès refusé', '', 'Rechargez la page et saisissez-le à nouveau.');
+        return afficher('inconnu', 'Billet inconnu', '', 'Ce code ne correspond à aucune invitation.');
+      }
+
+      const nom = [data.prenom, data.nom].filter(Boolean).join(' ');
+      const places = data.places > 1 ? data.places + ' personnes' : '1 personne';
+      marquerLocalement(token);
+      majBarre();
+
+      if (data.dejaEntre) {
+        return afficher('double', 'Déjà entré', nom, places + ' · passage à ' + heure(data.entreA));
+      }
+      if (data.statut !== 'Présent(e)') {
+        return afficher('attention', 'Entrée notée', nom, 'N’avait pas confirmé sa présence · ' + places);
+      }
+      return afficher('ok', 'Bienvenue', nom, places);
+
+    } catch (err) {
+      // Réseau coupé : on décide avec la liste gardée en réserve.
+      const invite = liste.find(i => i.token === token);
+      if (!invite) {
+        return afficher('inconnu', 'Billet inconnu', '', 'Hors ligne · absent de la liste chargée.');
+      }
+      const nom = [invite.prenom, invite.nom].filter(Boolean).join(' ');
+      const places = invite.places > 1 ? invite.places + ' personnes' : '1 personne';
+
+      if (invite.entree) {
+        return afficher('double', 'Déjà entré', nom, 'Hors ligne · ' + places);
+      }
+      marquerLocalement(token);
+      file.push({ token: token, at: new Date().toISOString() });
+      ecrire(CLE_FILE, file);
+      majBarre();
+      return afficher('ok', 'Bienvenue', nom, places + ' · hors ligne, à synchroniser');
+    }
+  }
+
+  /* ---- Caméra ---- */
+  let flux = null, detecteur = null, boucle = null;
+
+  async function demarrerCamera() {
+    if (!('BarcodeDetector' in window)) {
+      $('aideScan').textContent = 'Ce navigateur ne sait pas lire les QR codes. Utilisez Chrome sur Android, ou saisissez le code du billet à la main (il est écrit sous le QR).';
+      return;
+    }
+    try {
+      flux = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const video = $('camera');
+      video.srcObject = flux;
+      video.classList.add('actif');
+      await video.play();
+
+      detecteur = new BarcodeDetector({ formats: ['qr_code'] });
+      $('demarrer').textContent = 'Arrêter la caméra';
+
+      const lireImage = async () => {
+        if (!flux) return;
+        try {
+          const codes = await detecteur.detect(video);
+          if (codes.length) await verifier(codes[0].rawValue);
+        } catch (err) {}
+        boucle = requestAnimationFrame(lireImage);
+      };
+      lireImage();
+    } catch (err) {
+      $('aideScan').textContent = 'Accès à la caméra refusé. Autorisez-le dans le navigateur, ou saisissez le code à la main.';
+    }
+  }
+
+  function arreterCamera() {
+    if (boucle) cancelAnimationFrame(boucle);
+    if (flux) flux.getTracks().forEach(t => t.stop());
+    flux = null;
+    $('camera').classList.remove('actif');
+    $('demarrer').textContent = 'Démarrer la caméra';
+  }
+
+  /* ---- Démarrage ---- */
+  $('entrer').addEventListener('click', async () => {
+    codeAdmin = $('code').value.trim();
+    if (!codeAdmin) return;
+    if (!apiPrete) { $('aideConnexion').textContent = 'Configuration du site absente (config.js).'; return; }
+
+    $('entrer').disabled = true;
+    $('aideConnexion').textContent = 'Chargement de la liste…';
+
+    try {
+      await chargerListe();
+      ecrire(CLE_CODE, codeAdmin);
+      ouvrirControle();
+    } catch (err) {
+      const cache = lire(CLE_LISTE, []);
+      if (cache.length) {
+        liste = cache;
+        ecrire(CLE_CODE, codeAdmin);
+        ouvrirControle();
+        $('aideScan').textContent = 'Liste chargée depuis la mémoire de ce téléphone : le serveur est injoignable.';
+      } else {
+        $('aideConnexion').textContent = 'Code refusé, ou serveur injoignable. Réessayez.';
+        $('entrer').disabled = false;
+      }
+    }
+  });
+
+  function ouvrirControle() {
+    $('connexion').classList.add('cache');
+    $('controle').classList.remove('cache');
+    file = lire(CLE_FILE, []);
+    majBarre();
+    viderFile();
+    $('manuel').focus();
+  }
+
+  $('demarrer').addEventListener('click', () => flux ? arreterCamera() : demarrerCamera());
+
+  $('valider').addEventListener('click', () => {
+    const code = $('manuel').value;
+    $('manuel').value = '';
+    dernierScan = { token: '', at: 0 }; // saisie manuelle : jamais bloquée par l'anti-répétition
+    verifier(code);
+  });
+  $('manuel').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('valider').click(); });
+
+  window.addEventListener('online', () => { majBarre(); viderFile(); });
+  window.addEventListener('offline', majBarre);
+
+  // Code déjà saisi sur ce téléphone : on le repropose sans le redemander.
+  const codeMemorise = lire(CLE_CODE, '');
+  if (codeMemorise) { $('code').value = codeMemorise; $('aideConnexion').textContent = 'Code déjà enregistré sur cet appareil.'; }
+})();
+</script>
+</body>
+</html>

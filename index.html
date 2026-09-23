@@ -340,6 +340,18 @@ h2{font-family:var(--display);font-weight:500;font-size:clamp(2rem,6vw,3rem);col
 .btn:disabled{opacity:.7;cursor:default}
 .form-note{text-align:center;font-size:.82rem;color:var(--gold-deep);margin-top:14px}
 .invite-hello{font-family:var(--display);font-style:italic;font-size:1.15rem;color:var(--wine);margin-bottom:14px}
+.billet{
+  max-width:340px;margin:28px auto 0;padding:22px 20px 18px;text-align:center;
+  background:var(--paper);border:1px solid var(--gold-light);border-radius:16px;
+  box-shadow:0 24px 44px -22px var(--shadow);
+}
+.billet .eyebrow{margin-bottom:6px}
+.billet-nom{font-family:var(--display);font-size:1.3rem;color:var(--wine);font-weight:600}
+.billet-places{font-family:var(--body);font-size:.9rem;color:var(--gold-deep);letter-spacing:.06em}
+.billet-qr{width:min(74%,230px);margin:16px auto 12px}
+.billet-qr svg{width:100%;height:auto;display:block;border-radius:6px}
+.billet-note{font-size:.82rem;color:var(--ink);opacity:.75;line-height:1.5}
+.billet-code{font-family:var(--display);letter-spacing:.24em;font-size:.82rem;color:var(--gold-deep);margin-top:10px}
 .rsvp-fields{opacity:0;max-height:0;overflow:hidden;transition:opacity .5s ease, max-height .6s ease}
 .rsvp-fields.open{opacity:1;max-height:900px}
 
@@ -667,6 +679,15 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
         <button class="btn" id="send">Envoyer ma réponse</button>
         <p class="form-note" id="status">Avant le 1er décembre 2026</p>
       </div>
+
+      <div class="billet" id="billet" hidden>
+        <p class="eyebrow">Votre billet d'entrée</p>
+        <p class="billet-nom" id="billetNom"></p>
+        <p class="billet-places" id="billetPlaces"></p>
+        <div class="billet-qr" id="billetQr"></div>
+        <p class="billet-note">À présenter à l'entrée le 19 décembre.<br>Pensez à en faire une capture d'écran.</p>
+        <p class="billet-code" id="billetCode"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -679,6 +700,7 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
 </footer>
 
 <script src="config.js"></script>
+<script src="qr.js"></script>
 <script>
 (function(){
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -794,6 +816,18 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
     repEl.focus();
   });
 
+  function afficherBillet(inv, places){
+    if(typeof QR === 'undefined') return;
+    const billet = document.getElementById('billet');
+    const nb = Number(places) > 0 ? Number(places) : 1;
+
+    document.getElementById('billetNom').textContent = [inv.prenom, inv.nom].filter(Boolean).join(' ');
+    document.getElementById('billetPlaces').textContent = nb > 1 ? nb + ' personnes' : '1 personne';
+    document.getElementById('billetQr').innerHTML = QR.svg(inviteToken);
+    document.getElementById('billetCode').textContent = inviteToken;
+    billet.hidden = false;
+  }
+
   function appliquerInvitation(inv){
     const prenom = (inv.prenom || inv.nom || '').trim();
     if(prenom){
@@ -812,6 +846,8 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
 
     if(inv.present) repEl.value = inv.present;
     if(inv.message) msgEl.value = inv.message;
+
+    if(inv.statut === 'Présent(e)') afficherBillet(inv, inv.placesConfirmees || places);
 
     if(inv.statut){
       stateEl.textContent = 'Réponse déjà enregistrée : ' + inv.statut + '. Vous pouvez la modifier.';
@@ -875,9 +911,18 @@ Et aujourd’hui, nous voilà prêts à écrire la suite, pour toujours 💍❤�
       const res = await reponse.json();
       if(!res.ok) throw new Error(res.message || 'refus');
       statusEl.textContent = repEl.value === 'oui'
-        ? 'Merci ! Votre présence est enregistrée.'
+        ? 'Merci ! Votre présence est enregistrée. Votre billet apparaît ci-dessous.'
         : 'Merci pour votre réponse, vous nous manquerez.';
       btn.textContent = 'Réponse envoyée';
+      // L'invité doit pouvoir se corriger tout de suite (nombre de personnes, changement d'avis).
+      setTimeout(()=>{ btn.disabled = false; btn.textContent = 'Mettre à jour ma réponse'; }, 2000);
+
+      if(repEl.value === 'oui'){
+        afficherBillet({ prenom: res.prenom, nom: '' }, res.placesConfirmees || nbEl.value);
+        document.getElementById('billet').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }else{
+        document.getElementById('billet').hidden = true;
+      }
     }catch(err){
       statusEl.textContent = 'Oups, l’envoi a échoué. Réessayez dans un instant.';
       btn.disabled = false;
