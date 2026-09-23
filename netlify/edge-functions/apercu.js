@@ -3,7 +3,7 @@
  *
  * WhatsApp n'execute pas le JavaScript de la page : il lit uniquement le HTML brut.
  * Cette fonction s'execute sur le serveur a chaque ouverture du lien et remplace la
- * ligne de description par le prenom de l'invite quand le lien en contient un (?n=Noah).
+ * ligne de description par le nom de l'invite quand le lien en contient un (?n=Noah).
  * Sans prenom, la page est renvoyee telle quelle.
  *
  * Aucune configuration : Netlify detecte ce dossier automatiquement.
@@ -16,13 +16,13 @@ const echapper = (texte) => texte
   .replace(/"/g, '&quot;');
 
 export default async (request, context) => {
-  const prenom = (new URL(request.url).searchParams.get('n') || '').trim().slice(0, 40);
+  const prenom = (new URL(request.url).searchParams.get('n') || '').trim().slice(0, 60);
   if (!prenom) return; // pas de prenom : rien a personnaliser
 
   const reponse = await context.next();
   if (!(reponse.headers.get('content-type') || '').includes('text/html')) return reponse;
 
-  const salutation = echapper('Bonjour ' + prenom);
+  const salutation = echapper(prenom);
   const html = (await reponse.text())
     .replace('<meta property="og:description" content="19 décembre 2026 · Yaoundé, Cameroun">',
              '<meta property="og:description" content="' + salutation + '">')
