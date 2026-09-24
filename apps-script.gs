@@ -22,7 +22,7 @@ const API_FEUILLE = 'Invités';
 
 // Code tape par l'hote sur la page de controle. Il n'apparait nulle part dans le site :
 // changez-le par ce que vous voulez, et ne le communiquez qu'aux personnes a l'entree.
-const ADMIN_CODE = '19-12-2026';
+const ADMIN_CODE = 'Votre super password';
 
 const C_PRENOM = 1, C_NOM = 2, C_PLACES = 4, C_TOKEN = 5,
       C_STATUT = 7, C_PLACES_OK = 8, C_REPONDU = 9,
