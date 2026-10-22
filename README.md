@@ -76,7 +76,7 @@ Les liens déjà générés ne sont jamais modifiés : relancez autant de fois q
 | `vendor/jsqr.js` | Lit les QR codes quand le navigateur ne sait pas le faire (Safari). Licence Apache 2.0 |
 | `netlify/edge-functions/apercu.js` | Met le nom de l'invité dans l'aperçu WhatsApp du lien |
 | `config.js` | `SCRIPT_URL` et `RSVP_TOKEN` — l'adresse du script Google et la clé partagée |
-| `og-invitation.jpg` | L'image affichée dans l'aperçu des liens |
+| `assets/og-invitation.jpg` | L'image affichée dans l'aperçu des liens |
 
 ### Le tableur (à coller dans Apps Script)
 
