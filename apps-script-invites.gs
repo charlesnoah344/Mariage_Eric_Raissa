@@ -20,7 +20,7 @@ const SITE_URL = 'https://fairepart-mariage-raissa-eric.netlify.app/';
 // Site de secours, pour les invités dont l'opérateur n'atteint pas Netlify.
 // Laissez la chaîne vide tant que l'adresse n'existe pas : la colonne restera vide
 // plutôt que de se remplir de liens cassés.
-const SITE_URL_SECOURS = '';
+const SITE_URL_SECOURS = 'https://fairepart-mariage-eric-raissa.pages.dev/';
 
 const FEUILLE_INVITES = 'Invités';
 

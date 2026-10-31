@@ -1,7 +1,7 @@
 # Faire-part de mariage — Raïssa & Eric
 
 **Le site : https://fairepart-mariage-raissa-eric.netlify.app**
-**Site de secours : https://<projet>.pages.dev**
+**Site de secours : https://fairepart-mariage-eric-raissa.pages.dev**
 
 Faire-part numérique du mariage de Raïssa & Eric, le **19 décembre 2026 à Yaoundé**.
 Chaque invité reçoit un lien personnel, confirme sa présence, reçoit un billet avec QR code,
