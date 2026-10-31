@@ -16,14 +16,22 @@
  */
 
 const SITE_URL = 'https://fairepart-mariage-raissa-eric.netlify.app/';
+
+// Site de secours, pour les invités dont l'opérateur n'atteint pas Netlify.
+// Laissez la chaîne vide tant que l'adresse n'existe pas : la colonne restera vide
+// plutôt que de se remplir de liens cassés.
+const SITE_URL_SECOURS = '';
+
 const FEUILLE_INVITES = 'Invités';
 
 const COLONNES = [
   'Prénom', 'Nom', 'Téléphone', 'Places', 'Token', 'Lien',
-  'Statut', 'Places confirmées', 'Répondu le', 'Entré à', 'Entrées comptées', 'Message'
+  'Statut', 'Places confirmées', 'Répondu le', 'Entré à', 'Entrées comptées', 'Message',
+  'Lien secours'
 ];
 
-const COL_PRENOM = 1, COL_NOM = 2, COL_PLACES = 4, COL_TOKEN = 5, COL_LIEN = 6;
+const COL_PRENOM = 1, COL_NOM = 2, COL_PLACES = 4, COL_TOKEN = 5, COL_LIEN = 6,
+      COL_LIEN_SECOURS = 13;
 
 // Alphabet sans caractères ambigus (ni 0/O, ni 1/l/I) : un token reste lisible et dictable.
 const ALPHABET = '23456789abcdefghjkmnpqrstuvwxyz';
@@ -55,6 +63,7 @@ function preparerFeuilleInvites() {
     .setFontColor('#e2c489');
   feuille.setFrozenRows(1);
   feuille.setColumnWidth(COL_LIEN, 320);
+  feuille.setColumnWidth(COL_LIEN_SECOURS, 320);
   feuille.getRange(2, COL_PLACES, feuille.getMaxRows() - 1, 1).setHorizontalAlignment('center');
 
   SpreadsheetApp.getUi().alert(
@@ -88,7 +97,7 @@ function genererLiensManquants() {
     if (token) tokensUtilises[token] = true;
   });
 
-  const tokens = [], liens = [];
+  const tokens = [], liens = [], liensSecours = [];
   let generes = 0, ignorees = 0;
 
   donnees.forEach(ligne => {
@@ -97,8 +106,11 @@ function genererLiensManquants() {
 
     if (token) {
       // Lien déjà généré : on le laisse intact, on répare seulement une URL manquante.
+      // C'est ce qui remplit le lien de secours des invités créés avant son existence.
       tokens.push([token]);
       liens.push([String(ligne[COL_LIEN - 1]).trim() || lienPour(token, ligne[COL_PRENOM - 1])]);
+      liensSecours.push([String(ligne[COL_LIEN_SECOURS - 1]).trim()
+        || lienSecoursPour(token, ligne[COL_PRENOM - 1])]);
       return;
     }
 
@@ -106,6 +118,7 @@ function genererLiensManquants() {
       // Ligne vide ou incomplète : on ne crée pas d'invitation fantôme.
       tokens.push(['']);
       liens.push(['']);
+      liensSecours.push(['']);
       if (String(ligne[COL_LIEN - 1]).trim() === '' && ligne.some(v => String(v).trim() !== '')) ignorees++;
       return;
     }
@@ -114,11 +127,13 @@ function genererLiensManquants() {
     tokensUtilises[token] = true;
     tokens.push([token]);
     liens.push([lienPour(token, ligne[COL_PRENOM - 1])]);
+    liensSecours.push([lienSecoursPour(token, ligne[COL_PRENOM - 1])]);
     generes++;
   });
 
   feuille.getRange(2, COL_TOKEN, nbLignes, 1).setValues(tokens);
   feuille.getRange(2, COL_LIEN, nbLignes, 1).setValues(liens);
+  feuille.getRange(2, COL_LIEN_SECOURS, nbLignes, 1).setValues(liensSecours);
 
   let message = generes === 0
     ? 'Aucun nouveau lien à générer : tous les invités saisis en ont déjà un.'
@@ -129,6 +144,10 @@ function genererLiensManquants() {
                ' car ni le prénom ni le nom n\'était renseigné.';
   }
 
+  if (!SITE_URL_SECOURS) {
+    message += "\n\nLa colonne « Lien secours » reste vide : renseignez SITE_URL_SECOURS en haut de ce script.";
+  }
+
   ui.alert(message);
 }
 
@@ -137,6 +156,12 @@ function lienPour(token, prenom) {
   // dans l'apercu WhatsApp. C'est le token, et lui seul, qui identifie l'invitation.
   const p = String(prenom || '').trim();
   return SITE_URL + '?i=' + token + (p ? '&n=' + encodeURIComponent(p) : '');
+}
+
+function lienSecoursPour(token, prenom) {
+  if (!SITE_URL_SECOURS) return '';
+  const p = String(prenom || '').trim();
+  return SITE_URL_SECOURS + '?i=' + token + (p ? '&n=' + encodeURIComponent(p) : '');
 }
 
 function nouveauToken(dejaUtilises) {

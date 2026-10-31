@@ -1,13 +1,21 @@
 # Faire-part de mariage — Raïssa & Eric
 
 **Le site : https://fairepart-mariage-raissa-eric.netlify.app**
+**Site de secours : https://<projet>.pages.dev**
 
 Faire-part numérique du mariage de Raïssa & Eric, le **19 décembre 2026 à Yaoundé**.
 Chaque invité reçoit un lien personnel, confirme sa présence, reçoit un billet avec QR code,
 et ce QR est scanné à l'entrée le jour J.
 
-Site statique hébergé sur Netlify. Les données vivent dans un Google Sheet,
-piloté par Google Apps Script. Aucun serveur à payer, aucune base de données.
+Site statique, publié sur **deux hébergeurs** : certains opérateurs camerounais
+(Orange notamment) n'atteignent pas Netlify, ces invités reçoivent donc le lien de secours
+hébergé sur Cloudflare Pages. Les deux versions sont identiques et partagent le même
+Google Sheet. Aucun serveur à payer, aucune base de données.
+
+> **La version Netlify est figée.** Son déploiement automatique a été désactivé pour
+> protéger les invités déjà servis : ce qui est poussé sur GitHub ne part plus que vers
+> Cloudflare. Pour que Netlify reçoive une correction, réactivez le déploiement dans
+> **Site configuration → Build & deploy → Continuous deployment**.
 
 ---
 
@@ -25,8 +33,9 @@ Ne la communiquez qu'aux personnes qui tiennent l'entrée.
 
 ## Le parcours d'un invité
 
-1. Il reçoit par WhatsApp un lien personnel : `…netlify.app/?i=TOKEN&n=Son%20Nom`
-   L'aperçu WhatsApp affiche son nom, grâce à `netlify/edge-functions/apercu.js`.
+1. Il reçoit par WhatsApp un lien personnel : `…/?i=TOKEN&n=Son%20Nom`, sur l'une ou
+   l'autre des deux adresses. L'aperçu WhatsApp affiche son nom, grâce à la fonction
+   serveur de l'hébergeur concerné (voir `apercu-commun.js`).
 2. Il ouvre le lien : l'enveloppe s'ouvre sur le faire-part.
    Son nom et son nombre de places sont déjà remplis dans le formulaire de réponse.
 3. Il confirme sa présence : la réponse s'écrit **dans sa ligne** du Google Sheet.
@@ -48,6 +57,7 @@ Un seul onglet, **« Invités »**, une ligne par **invitation** (une famille = 
 | Token, Lien | Le menu **Invitations** du tableur |
 | Statut, Places confirmées, Répondu le, Message | L'invité, en répondant |
 | Entré à, Entrées comptées | La page de contrôle, le jour J |
+| Lien secours | Le même menu — l'adresse Cloudflare, pour les invités qui n'atteignent pas Netlify |
 
 ### Ajouter des invités
 
@@ -74,7 +84,9 @@ Les liens déjà générés ne sont jamais modifiés : relancez autant de fois q
 | `controle.html` | La page de scan des entrées |
 | `qr.js` | Génère les QR codes, sans bibliothèque externe, pour qu'un billet s'affiche même hors ligne |
 | `vendor/jsqr.js` | Lit les QR codes quand le navigateur ne sait pas le faire (Safari). Licence Apache 2.0 |
-| `netlify/edge-functions/apercu.js` | Met le nom de l'invité dans l'aperçu WhatsApp du lien |
+| `apercu-commun.js` | Met le nom de l'invité dans l'aperçu WhatsApp et corrige l'adresse de l'image selon l'hébergeur |
+| `netlify/edge-functions/apercu.js` | Point d'entrée Netlify — appelle `apercu-commun.js` |
+| `functions/_middleware.js` | Point d'entrée Cloudflare Pages — appelle le même module |
 | `config.js` | `SCRIPT_URL` et `RSVP_TOKEN` — l'adresse du script Google et la clé partagée |
 | `assets/og-invitation.jpg` | L'image affichée dans l'aperçu des liens |
 
@@ -133,6 +145,11 @@ Ce que le contrôleur voit :
 Les entrées sont mises en attente et partent toutes seules dès le retour de la connexion
 (le compteur en bas indique « X à synchroniser »).
 
+> **Un téléphone, une seule adresse.** La liste hors ligne et les entrées en attente sont
+> mémorisées par adresse : un hôte qui passe de Netlify à Cloudflare en pleine soirée
+> repart avec une mémoire vide et perd ce qui n'était pas encore synchronisé. Chacun
+> choisit son adresse avant l'ouverture des portes, et n'en change plus.
+
 **Toujours possible en secours** : saisir à la main le code écrit sous le QR du billet.
 Les codes n'utilisent aucun caractère ambigu (ni `0`/`O`, ni `1`/`l`), ils se dictent au téléphone.
 
@@ -147,6 +164,7 @@ Les codes n'utilisent aucun caractère ambigu (ni `0`/`O`, ni `1`/`l`), ils se d
 | Le site ne reconnaît plus aucun lien | `config.js` absent du déploiement, ou `SCRIPT_URL` pointe vers un ancien déploiement |
 | Le déploiement Netlify échoue | Une commande de build est inscrite dans l'interface Netlify. Le site est statique : **Build command** doit rester vide, **Publish directory** à `.` |
 | L'aperçu WhatsApp est resté l'ancien | WhatsApp garde les aperçus en mémoire par lien. Testez avec un lien jamais partagé, ou ajoutez `&v=2` à la fin |
+| Un invité n'arrive pas à ouvrir le site | Son opérateur n'atteint pas l'hébergeur. Envoyez-lui le **lien secours** de sa ligne dans le tableur |
 | Le premier chargement est lent | Réveil à froid de Google Apps Script : la première requête peut prendre plusieurs secondes |
 
 ---
